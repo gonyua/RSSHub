@@ -44,7 +44,7 @@ export const errorHandler: ErrorHandler = (error, ctx) => {
     }
 
     let errorMessage = (process.env.NODE_ENV || process.env.VERCEL_ENV) === 'production' ? error.message : error.stack || error.message;
-    switch (error.constructor.name) {
+    switch (error.name || error.constructor.name) {
         case 'HTTPError':
         case 'RequestError':
         case 'FetchError':

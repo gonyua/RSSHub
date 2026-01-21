@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { serveStatic } from '@hono/node-server/serve-static';
@@ -17,6 +18,15 @@ import { isWorker } from '@/utils/is-worker';
 import logger from '@/utils/logger';
 
 const __dirname = import.meta.dirname;
+
+const rebangAppJsPath = path.join(__dirname, 'assets/rebang/app.js');
+
+const rebangAppJs: Handler = async (ctx) => {
+    const body = await readFile(rebangAppJsPath, 'utf8');
+    ctx.header('Content-Type', 'text/javascript; charset=utf-8');
+    ctx.header('Cache-Control', 'public, max-age=3600');
+    return ctx.body(body);
+};
 
 function isSafeRoutes(routes: RoutesType): boolean {
     return Object.values(routes).every((route: Route) => !route.features?.nsfw);
@@ -256,6 +266,7 @@ for (const namespace in namespaces) {
 }
 
 app.get('/', index);
+app.get('/rebang/app.js', rebangAppJs);
 app.get('/rebang', rebang);
 app.get('/rebang/tech', rebang);
 app.get('/rebang/ent', rebang);
