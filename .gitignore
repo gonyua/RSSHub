@@ -35,6 +35,7 @@ Session.vim
 combined.log
 dump.rdb
 error.log
+logs/*.log
 npm-debug.log
 package-lock.json
 # pnpm-lock.yaml

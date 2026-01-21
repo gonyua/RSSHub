@@ -8,8 +8,11 @@
 ## 关键文档
 
 - RSSHub 路由总览：`https://docs.rsshub.app/zh/routes/`
-- 掘金：`https://docs.rsshub.app/routes/juejin`
-- GitHub：`https://docs.rsshub.app/routes/github`
+- 新 RSS 开发：`https://docs.rsshub.app/zh/joinus/new-rss/start-code`
+- 提交路由：`https://docs.rsshub.app/zh/joinus/new-rss/submit-route`
+- 脚本规范：`https://docs.rsshub.app/zh/joinus/advanced/script-standard`
+- 使用缓存：`https://docs.rsshub.app/zh/joinus/advanced/use-cache`
+- pubDate：`https://docs.rsshub.app/zh/joinus/advanced/pub-date`
 
 ## 综合（/rebang）
 
@@ -18,7 +21,9 @@
     - weekly：本周
     - monthly：本月
 - zhihu：知乎（route：/zhihu/hot）
-- weibo：微博（disabled：该节点需要 Puppeteer（且可能需要 WEIBO_COOKIES），默认不启用）
+- weibo：微博
+    - search：热搜（route：/weibo/search/hot）
+    - ent：文娱（disabled：RSSHub 暂无与该子榜单等价路由）
 - ithome：IT之家
     - today：日榜（route：/ithome/ranking/24h）
     - latest：最新（route：/ithome/it）
@@ -31,7 +36,7 @@
     - all-digital：数码（route：/hupu/all/all-digital）
     - all-ent：影视娱乐（route：/hupu/all/all-ent）
     - all-soccer：国际足球（route：/hupu/all/all-soccer）
-- tencent-news：腾讯新闻（disabled：RSSHub 暂无“腾讯新闻热榜”类路由）
+- tencent-news：腾讯新闻（route：/tencent/news/hot-ranking）
 - douban-community：豆瓣社区（disabled：RSSHub 暂无“豆瓣社区热榜/发现小组/热门话题”类路由）
     - discussion：精选讨论（disabled：RSSHub 暂无“豆瓣社区精选讨论”类路由）
     - topic：热门话题（disabled：RSSHub 暂无“豆瓣社区热门话题”类路由）

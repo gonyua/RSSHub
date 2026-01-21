@@ -21,6 +21,8 @@
 - 已完成：侧栏“轮换榜/抽样榜”（换一换）、当前列表搜索
 - 已对齐 rebang.today 的菜单结构（含各节点子 Tab），并在缺失/需配置的节点上做禁用与原因提示
 - 已新增：来源覆盖审计清单 `rebang-sources-audit.md`
+- 已修正：Rebang 内部拉取 feed 时统一传 `sorted=false`，避免 RSSHub 默认按 `pubDate` 重排导致“热度榜顺序”被打乱
+- 已新增：腾讯新闻热榜路由 `/tencent/news/hot-ranking`（用于对齐 `rebang.today/home?tab=tencent-news` 的“热度排序”）
 
 ## 1. 竞品观察结论（基于 MCP）
 

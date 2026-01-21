@@ -89,7 +89,7 @@ const hupuSubTabs: RebangSubTab[] = [
     { key: 'all-soccer', name: '国际足球', rsshubPath: '/hupu/all/all-soccer' },
 ];
 
-const weiboSubTabs: RebangSubTab[] = [makeDisabledSubTab('search', '热搜', '该节点需要 Puppeteer（且可能需要 WEIBO_COOKIES），默认不启用'), makeDisabledSubTab('ent', '文娱', 'RSSHub 暂无与该子榜单等价路由')];
+const weiboSubTabs: RebangSubTab[] = [{ key: 'search', name: '热搜', rsshubPath: '/weibo/search/hot' }, makeDisabledSubTab('ent', '文娱', 'RSSHub 暂无与该子榜单等价路由')];
 
 const doubanCommunitySubTabs: RebangSubTab[] = [
     makeDisabledSubTab('discussion', '精选讨论', 'RSSHub 暂无“豆瓣社区精选讨论”类路由'),
@@ -317,10 +317,10 @@ export const rebangMenu: RebangMenu = {
                     aggregateSources,
                 },
                 { key: 'zhihu', name: '知乎', iconText: '知', type: 'feed', rsshubPath: '/zhihu/hot' },
-                makeDisabledTab('weibo', '微博', '微', '该节点需要 Puppeteer（且可能需要 WEIBO_COOKIES），默认不启用'),
+                { key: 'weibo', name: '微博', iconText: '微', type: 'feed', defaultSubTabKey: 'search', subTabs: weiboSubTabs },
                 { key: 'ithome', name: 'IT之家', iconText: 'IT', type: 'feed', defaultSubTabKey: 'today', subTabs: ithomeSubTabs },
                 { key: 'hupu', name: '虎扑', iconText: '虎', type: 'feed', defaultSubTabKey: 'all-gambia', subTabs: hupuSubTabs },
-                makeDisabledTab('tencent-news', '腾讯新闻', '腾', 'RSSHub 暂无“腾讯新闻热榜”类路由'),
+                { key: 'tencent-news', name: '腾讯新闻', iconText: '腾', type: 'feed', rsshubPath: '/tencent/news/hot-ranking' },
                 {
                     key: 'douban-community',
                     name: '豆瓣社区',
@@ -384,7 +384,7 @@ export const rebangMenu: RebangMenu = {
             path: '/rebang/ent',
             defaultTabKey: 'bilibili',
             tabs: [
-                { key: 'weibo', name: '微博', iconText: '微', type: 'feed', defaultSubTabKey: 'search', subTabs: weiboSubTabs, disabled: true, disabledReason: '该节点需要 Puppeteer（且可能需要 WEIBO_COOKIES），默认不启用' },
+                { key: 'weibo', name: '微博', iconText: '微', type: 'feed', defaultSubTabKey: 'search', subTabs: weiboSubTabs },
                 { key: 'hupu', name: '虎扑', iconText: '虎', type: 'feed', defaultSubTabKey: 'all-ent', subTabs: hupuSubTabs },
                 { key: 'douban-media', name: '豆瓣书影音', iconText: '豆', type: 'feed', defaultSubTabKey: 'movie', subTabs: doubanMediaSubTabs },
                 { key: 'xiaohongshu', name: '小红书', iconText: '书', type: 'feed', defaultSubTabKey: 'hot-search', subTabs: xiaohongshuSubTabs, disabled: true, disabledReason: 'RSSHub 暂无“小红书热点榜”类路由' },

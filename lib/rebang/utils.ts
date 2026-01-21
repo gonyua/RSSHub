@@ -92,7 +92,8 @@ export const buildSelfUrl = (origin: string, rsshubPath: string, query: Record<s
 };
 
 export async function fetchJsonFeed(origin: string, rsshubPath: string, limit: number, signal?: AbortSignal): Promise<JsonFeed> {
-    const url = buildSelfUrl(origin, rsshubPath, { format: 'json', limit: String(limit) });
+    // Rebang lists should preserve the original ranking order (do not sort by pubDate)
+    const url = buildSelfUrl(origin, rsshubPath, { format: 'json', limit: String(limit), sorted: 'false' });
     const res = await fetch(url, {
         method: 'GET',
         headers: {

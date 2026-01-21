@@ -19,10 +19,8 @@
 
     https://docs.rsshub.app/zh/joinus/new-rss/start-code
     https://docs.rsshub.app/zh/joinus/new-rss/submit-route
-    https://docs.rsshub.app/zh/joinus/new-rss/submit-route
     https://docs.rsshub.app/zh/joinus/advanced/script-standard
     https://docs.rsshub.app/zh/joinus/advanced/use-cache
-    https://docs.rsshub.app/zh/joinus/advanced/pub-date
     https://docs.rsshub.app/zh/joinus/advanced/pub-date
 
 - 方式 A（推荐本地快速验证）：临时指定系统 Chrome：CHROMIUM_EXECUTABLE_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" 再
