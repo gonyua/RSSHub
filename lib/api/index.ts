@@ -8,6 +8,9 @@ import { handler as namespaceAllHandler, route as namespaceAllRoute } from '@/ap
 import { handler as namespaceOneHandler, route as namespaceOneRoute } from '@/api/namespace/one';
 import { handler as radarRulesAllHandler, route as radarRulesAllRoute } from '@/api/radar/rules/all';
 import { handler as radarRulesOneHandler, route as radarRulesOneRoute } from '@/api/radar/rules/one';
+import { handler as rebangItemsHandler } from '@/api/rebang/items';
+import { handler as rebangMenuHandler } from '@/api/rebang/menu';
+import { handler as rebangRisingHandler } from '@/api/rebang/rising';
 
 const app = new OpenAPIHono();
 
@@ -17,6 +20,10 @@ app.openapi(radarRulesAllRoute, radarRulesAllHandler);
 app.openapi(radarRulesOneRoute, radarRulesOneHandler);
 app.openapi(categoryOneRoute, categoryOneHandler);
 app.openapi(followConfigRoute, followConfigHandler);
+
+app.get('/rebang/menu', rebangMenuHandler);
+app.get('/rebang/items', rebangItemsHandler);
+app.get('/rebang/rising', rebangRisingHandler);
 
 const docs = app.getOpenAPI31Document({
     openapi: '3.1.0',

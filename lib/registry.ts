@@ -9,6 +9,7 @@ import { config } from '@/config';
 import healthz from '@/routes/healthz';
 import index from '@/routes/index';
 import metrics from '@/routes/metrics';
+import rebang from '@/routes/rebang';
 import robotstxt from '@/routes/robots.txt';
 import type { APIRoute, Namespace, Route } from '@/types';
 import { directoryImport } from '@/utils/directory-import';
@@ -255,6 +256,14 @@ for (const namespace in namespaces) {
 }
 
 app.get('/', index);
+app.get('/rebang', rebang);
+app.get('/rebang/tech', rebang);
+app.get('/rebang/ent', rebang);
+app.get('/rebang/community', rebang);
+app.get('/rebang/fin', rebang);
+app.get('/rebang/dev', rebang);
+app.get('/rebang/setting', rebang);
+app.get('/rebang/following', rebang);
 app.get('/healthz', healthz);
 app.get('/robots.txt', robotstxt);
 if (config.debugInfo !== 'false') {

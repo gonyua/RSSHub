@@ -1,0 +1,338 @@
+# Rebang.Today 菜单对齐（RSSHub 映射总表）
+
+更新日期：2026-01-21
+
+> 说明：菜单结构以 rebang.today 的 menu_tabs 为基准；每个节点/子 Tab 映射到 RSSHub 路由（尽量使用 docs 中已有路由）。
+> disabled 表示默认不启用（RSSHub 缺失 / 需要配置 / 高成本）。
+
+## 关键文档
+
+- RSSHub 路由总览：`https://docs.rsshub.app/zh/routes/`
+- 掘金：`https://docs.rsshub.app/routes/juejin`
+- GitHub：`https://docs.rsshub.app/routes/github`
+
+## 综合（/rebang）
+
+- top：全站（aggregate）
+    - today：今日
+    - weekly：本周
+    - monthly：本月
+- zhihu：知乎（route：/zhihu/hot）
+- weibo：微博（disabled：该节点需要 Puppeteer（且可能需要 WEIBO_COOKIES），默认不启用）
+- ithome：IT之家
+    - today：日榜（route：/ithome/ranking/24h）
+    - latest：最新（route：/ithome/it）
+    - weekly：周榜（route：/ithome/ranking/7days）
+    - monthly：月榜（route：/ithome/ranking/monthly）
+- hupu：虎扑
+    - all-gambia：步行街（route：/hupu/all/all-gambia）
+    - all-nba：NBA（route：/hupu/all/all-nba）
+    - all-gg：游戏（route：/hupu/all/all-gg）
+    - all-digital：数码（route：/hupu/all/all-digital）
+    - all-ent：影视娱乐（route：/hupu/all/all-ent）
+    - all-soccer：国际足球（route：/hupu/all/all-soccer）
+- tencent-news：腾讯新闻（disabled：RSSHub 暂无“腾讯新闻热榜”类路由）
+- douban-community：豆瓣社区（disabled：RSSHub 暂无“豆瓣社区热榜/发现小组/热门话题”类路由）
+    - discussion：精选讨论（disabled：RSSHub 暂无“豆瓣社区精选讨论”类路由）
+    - topic：热门话题（disabled：RSSHub 暂无“豆瓣社区热门话题”类路由）
+    - group：发现小组（disabled：RSSHub 暂无“豆瓣社区发现小组”类路由）
+- huxiu：虎嗅
+    - hot：热文（route：/huxiu/article）
+    - latest：最新（route：/huxiu/moment）
+    - event：号外（disabled：RSSHub 暂无等价“号外”榜单，已留位）
+- sspai：少数派
+    - recommend：推荐（route：/sspai/index）
+    - hottest：最热（route：/sspai/matrix）
+- thepaper：澎湃新闻
+    - hot：热榜（route：/thepaper/sidebar/hotNews）
+- xiaohongshu：小红书（disabled：RSSHub 暂无“小红书热点榜”类路由）
+    - hot-search：热点（disabled：RSSHub 暂无“小红书热点榜”类路由）
+- 36kr：36氪
+    - hotlist：热榜（route：/36kr/recommend）
+    - latest：最新（route：/36kr/news）
+    - newsflashes：快讯（route：/36kr/newsflashes）
+- toutiao：今日头条（disabled：RSSHub 暂无“今日头条热榜”类路由）
+- ifanr：爱范儿（route：/ifanr/index）
+- douban-media：豆瓣书影音
+    - movie：电影（route：/douban/movie/coming）
+    - tv：电视（disabled：RSSHub 暂无“豆瓣电视热榜”类路由）
+    - book：读书（route：/douban/book/rank）
+    - music：音乐（disabled：RSSHub 暂无“豆瓣音乐热榜”类路由）
+- smzdm：什么值得买
+    - post：好文（route：/smzdm/haowen/1）
+    - goods-gp：好价（disabled：RSSHub 的“什么值得买排行榜”依赖 SMZDM_COOKIE，默认不启用）
+    - goods-bp：白菜价（disabled：RSSHub 的“什么值得买排行榜”依赖 SMZDM_COOKIE，默认不启用）
+- baidu：百度
+    - realtime：热搜（route：/baidu/top/realtime）
+    - phrase：热梗（disabled：RSSHub 的 `/baidu/top` 未提供“热梗”tab）
+    - novel：小说（route：/baidu/top/novel）
+    - movie：电影（route：/baidu/top/movie）
+    - teleplay：电视剧（route：/baidu/top/teleplay）
+    - car：汽车（route：/baidu/top/car）
+    - game：游戏（route：/baidu/top/game）
+- penti：喷嚏网
+    - tugua：喷嚏图卦（route：/dapenti/tugua）
+    - fushihui：浮世汇（disabled：RSSHub 仅有 `/dapenti/subject/:id`，需先确定栏目对应 id）
+    - lehuo：乐活（disabled：RSSHub 仅有 `/dapenti/subject/:id`，需先确定栏目对应 id）
+    - caijing：财经风云（disabled：RSSHub 仅有 `/dapenti/subject/:id`，需先确定栏目对应 id）
+    - leying：乐影（disabled：RSSHub 仅有 `/dapenti/subject/:id`，需先确定栏目对应 id）
+    - shijieguan：世界观（disabled：RSSHub 仅有 `/dapenti/subject/:id`，需先确定栏目对应 id）
+- ne-news：网易新闻
+    - htd：热议榜（route：/163/news/rank/whole/follow/day）
+    - news：新闻榜（route：/163/news/rank/whole/click/day）
+    - video：视频榜（disabled：RSSHub 暂无“网易新闻视频榜”类路由）
+- weread：微信读书
+    - rising：飙升榜（route：/qq/weread/rising）
+    - newbook：新书榜（route：/qq/weread/newbook）
+    - general_novel_rising：小说榜（route：/qq/weread/general_novel_rising）
+    - all：总榜（route：/qq/weread/all）
+    - newrating_publish：神作榜（route：/qq/weread/newrating_publish）
+    - newrating_potential_publish：神作潜力榜（route：/qq/weread/newrating_potential_publish）
+    - hot_search：热搜榜（route：/qq/weread/hot_search）
+- zhihu-daily：知乎日报（route：/zhihu/daily）
+- baidu-tieba：百度贴吧（disabled：RSSHub 暂无“贴吧热门话题榜”类路由）
+    - topic：热门话题（disabled：RSSHub 暂无“贴吧热门话题榜”类路由）
+- 52pojie：吾爱破解（disabled：本仓库未找到该站点路由）
+    - today：今日（disabled：本仓库未找到该站点路由）
+    - thisweek：本周（disabled：本仓库未找到该站点路由）
+    - thismonth：本月（disabled：本仓库未找到该站点路由）
+- guancha-user：观风闻
+    - hot-3：24小时（route：/guancha/fengwen）
+    - hot-6：3天（route：/guancha/fengwen）
+    - hot-7：7天（route：/guancha/fengwen）
+    - hot-8：3个月（route：/guancha/fengwen）
+- xueqiu：雪球
+    - topic：话题（route：/xueqiu/hots）
+    - news：新闻（route：/xueqiu/today）
+    - notice：公告（disabled：RSSHub 暂无“雪球公告榜”类路由）
+- landian：蓝点网
+    - article：文章（route：/landiannews）
+    - download：下载（route：/landiannews/category/download）
+- appinn：小众软件（disabled：本仓库未找到 appinn 路由）
+- apprcn：反斗限免（disabled：本仓库未找到 apprcn 路由）
+    - all：全部（disabled：本仓库未找到 apprcn 路由）
+    - ios：iOS（disabled：本仓库未找到 apprcn 路由）
+    - android：安卓（disabled：本仓库未找到 apprcn 路由）
+    - game：游戏（disabled：本仓库未找到 apprcn 路由）
+    - mac：Mac（disabled：本仓库未找到 apprcn 路由）
+    - windows：Windows（disabled：本仓库未找到 apprcn 路由）
+- zhibo8：直播吧（disabled：RSSHub 暂无“直播吧热榜”类路由（仅有论坛/更多列表））
+- douyin：抖音（disabled：RSSHub 暂无“抖音热榜”类路由）
+- bilibili：哔哩哔哩
+    - popular：热门（route：/bilibili/popular/all）
+    - weekly：每周必看（route：/bilibili/weekly）
+    - rank：排行榜（route：/bilibili/ranking/all）
+- xmyp：小米有品
+    - zhongchou：众筹（route：/xiaomiyoupin/crowdfunding）
+- gamersky：游民星空
+    - rec：今日推荐（route：/gamersky/news/today）
+    - spg：单机电玩（route：/gamersky/news/pc）
+    - ns：NS（route：/gamersky/news/ns）
+    - mobile：手游（route：/gamersky/news/mobile）
+    - online：网游（route：/gamersky/news/web）
+    - industry：业界（route：/gamersky/news/industry）
+    - hardware：硬件（route：/gamersky/news/hardware）
+    - tech：科技（route：/gamersky/news/tech）
+- juejin：掘金
+    - all：综合（route：/juejin/trending/all/weekly）
+    - backend：后端（route：/juejin/trending/backend/weekly）
+    - frontend：前端（route：/juejin/trending/frontend/weekly）
+    - android：Android（route：/juejin/trending/android/weekly）
+    - ios：iOS（route：/juejin/trending/ios/weekly）
+    - ai：人工智能（route：/juejin/trending/ai/weekly）
+    - dev-tools：开发工具（route：/juejin/trending/freebie/weekly）
+    - code-life：代码人生（route：/juejin/trending/all/weekly）
+    - read：阅读（route：/juejin/trending/article/weekly）
+- journal-tech：技术期刊（disabled：本仓库未找到同名路由）
+- github：GitHub（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - all：全部（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - java：Java（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - python：Python（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - javascript：JS（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - typescript：TS（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - c：C（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - c1：C++（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - c2：C#（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - go：Go（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - php：PHP（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - rust：Rust（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - swift：Swift（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - vue：Vue（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+
+## 科技（/rebang/tech）
+
+- ithome：IT之家
+    - today：日榜（route：/ithome/ranking/24h）
+    - latest：最新（route：/ithome/it）
+    - weekly：周榜（route：/ithome/ranking/7days）
+    - monthly：月榜（route：/ithome/ranking/monthly）
+- sspai：少数派
+    - recommend：推荐（route：/sspai/index）
+    - hottest：最热（route：/sspai/matrix）
+- ifanr：爱范儿（route：/ifanr/index）
+- landian：蓝点网
+    - article：文章（route：/landiannews）
+    - download：下载（route：/landiannews/category/download）
+- 36kr：36氪
+    - hotlist：热榜（route：/36kr/recommend）
+    - latest：最新（route：/36kr/news）
+    - newsflashes：快讯（route：/36kr/newsflashes）
+- 52pojie：吾爱破解（disabled：本仓库未找到该站点路由）
+    - today：今日（disabled：本仓库未找到该站点路由）
+    - thisweek：本周（disabled：本仓库未找到该站点路由）
+    - thismonth：本月（disabled：本仓库未找到该站点路由）
+- huxiu：虎嗅
+    - hot：热文（route：/huxiu/article）
+    - latest：最新（route：/huxiu/moment）
+    - event：号外（disabled：RSSHub 暂无等价“号外”榜单，已留位）
+- guokr：果壳（route：/guokr/scientific）
+
+## 娱乐（/rebang/ent）
+
+- weibo：微博（disabled：该节点需要 Puppeteer（且可能需要 WEIBO_COOKIES），默认不启用）
+    - search：热搜（disabled：该节点需要 Puppeteer（且可能需要 WEIBO_COOKIES），默认不启用）
+    - ent：文娱（disabled：RSSHub 暂无与该子榜单等价路由）
+- hupu：虎扑
+    - all-gambia：步行街（route：/hupu/all/all-gambia）
+    - all-nba：NBA（route：/hupu/all/all-nba）
+    - all-gg：游戏（route：/hupu/all/all-gg）
+    - all-digital：数码（route：/hupu/all/all-digital）
+    - all-ent：影视娱乐（route：/hupu/all/all-ent）
+    - all-soccer：国际足球（route：/hupu/all/all-soccer）
+- douban-media：豆瓣书影音
+    - movie：电影（route：/douban/movie/coming）
+    - tv：电视（disabled：RSSHub 暂无“豆瓣电视热榜”类路由）
+    - book：读书（route：/douban/book/rank）
+    - music：音乐（disabled：RSSHub 暂无“豆瓣音乐热榜”类路由）
+- xiaohongshu：小红书（disabled：RSSHub 暂无“小红书热点榜”类路由）
+    - hot-search：热点（disabled：RSSHub 暂无“小红书热点榜”类路由）
+- baidu-tieba：百度贴吧（disabled：RSSHub 暂无“贴吧热门话题榜”类路由）
+    - topic：热门话题（disabled：RSSHub 暂无“贴吧热门话题榜”类路由）
+- nga：NGA社区（route：/nga/forum/489）
+- gamersky：游民星空
+    - rec：今日推荐（route：/gamersky/news/today）
+    - spg：单机电玩（route：/gamersky/news/pc）
+    - ns：NS（route：/gamersky/news/ns）
+    - mobile：手游（route：/gamersky/news/mobile）
+    - online：网游（route：/gamersky/news/web）
+    - industry：业界（route：/gamersky/news/industry）
+    - hardware：硬件（route：/gamersky/news/hardware）
+    - tech：科技（route：/gamersky/news/tech）
+- penti：喷嚏网
+    - tugua：喷嚏图卦（route：/dapenti/tugua）
+    - fushihui：浮世汇（disabled：RSSHub 仅有 `/dapenti/subject/:id`，需先确定栏目对应 id）
+    - lehuo：乐活（disabled：RSSHub 仅有 `/dapenti/subject/:id`，需先确定栏目对应 id）
+    - caijing：财经风云（disabled：RSSHub 仅有 `/dapenti/subject/:id`，需先确定栏目对应 id）
+    - leying：乐影（disabled：RSSHub 仅有 `/dapenti/subject/:id`，需先确定栏目对应 id）
+    - shijieguan：世界观（disabled：RSSHub 仅有 `/dapenti/subject/:id`，需先确定栏目对应 id）
+- shadiao-news：沙雕新闻（disabled：本仓库未找到该站点路由）
+- bilibili：哔哩哔哩
+    - popular：热门（route：/bilibili/popular/all）
+    - weekly：每周必看（route：/bilibili/weekly）
+    - rank：排行榜（route：/bilibili/ranking/all）
+- douyin：抖音（disabled：RSSHub 暂无“抖音热榜”类路由）
+- kuaishou：快手（disabled：RSSHub 暂无“快手热榜”类路由（仅有 profile））
+- acfun：AcFun（disabled：RSSHub 暂无“AcFun 榜单”类路由）
+    - day：今日（disabled：RSSHub 暂无“AcFun 榜单”类路由）
+    - three：三日（disabled：RSSHub 暂无“AcFun 榜单”类路由）
+    - week：本周（disabled：RSSHub 暂无“AcFun 榜单”类路由）
+
+## 社区（/rebang/community）
+
+- douban-community：豆瓣社区（disabled：RSSHub 暂无“豆瓣社区热榜/发现小组/热门话题”类路由）
+    - discussion：精选讨论（disabled：RSSHub 暂无“豆瓣社区精选讨论”类路由）
+    - topic：热门话题（disabled：RSSHub 暂无“豆瓣社区热门话题”类路由）
+    - group：发现小组（disabled：RSSHub 暂无“豆瓣社区发现小组”类路由）
+- hupu：虎扑
+    - all-gambia：步行街（route：/hupu/all/all-gambia）
+    - all-nba：NBA（route：/hupu/all/all-nba）
+    - all-gg：游戏（route：/hupu/all/all-gg）
+    - all-digital：数码（route：/hupu/all/all-digital）
+    - all-ent：影视娱乐（route：/hupu/all/all-ent）
+    - all-soccer：国际足球（route：/hupu/all/all-soccer）
+- baidu-tieba：百度贴吧（disabled：RSSHub 暂无“贴吧热门话题榜”类路由）
+    - topic：热门话题（disabled：RSSHub 暂无“贴吧热门话题榜”类路由）
+- guancha-user：观风闻
+    - hot-3：24小时（route：/guancha/fengwen）
+    - hot-6：3天（route：/guancha/fengwen）
+    - hot-7：7天（route：/guancha/fengwen）
+    - hot-8：3个月（route：/guancha/fengwen）
+- nga：NGA社区（route：/nga/forum/489）
+- kds：宽带山（disabled：本仓库未找到 kds 路由）
+    - hot-today：今日（disabled：本仓库未找到 kds 路由）
+    - hot-weekly：本周（disabled：本仓库未找到 kds 路由）
+    - hot-monthly：本月（disabled：本仓库未找到 kds 路由）
+- v2ex：V2EX
+    - tech：技术（route：/v2ex/tab/tech）
+    - creative：创意（route：/v2ex/tab/creative）
+    - play：好玩（route：/v2ex/tab/play）
+    - apple：Apple（route：/v2ex/tab/apple）
+    - jobs：酷工作（route：/v2ex/tab/jobs）
+    - deals：交易（route：/v2ex/tab/deals）
+    - city：城市（route：/v2ex/tab/city）
+    - qna：问与答（route：/v2ex/tab/qna）
+    - hot：最热（route：/v2ex/tab/hot）
+    - all：全部（route：/v2ex/tab/all）
+    - r2：R2（route：/v2ex/tab/r2）
+
+## 财经（/rebang/fin）
+
+- xueqiu：雪球
+    - topic：话题（route：/xueqiu/hots）
+    - news：新闻（route：/xueqiu/today）
+    - notice：公告（disabled：RSSHub 暂无“雪球公告榜”类路由）
+- eastmoney：东方财富（disabled：RSSHub 暂无“东方财富热榜”类路由（多为研报/用户内容））
+- sina-fin：新浪财经
+    - all：总榜（route：/sina/rollnews/2516）
+    - stock：股市榜（route：/sina/rollnews/2517）
+    - future：期市榜（disabled：RSSHub 暂无“期市榜”类路由）
+- gelonghui：格隆汇
+    - recommend：推荐（route：/gelonghui/home）
+    - hot-day：日排行（route：/gelonghui/hot-article）
+    - hot-week：周排行（route：/gelonghui/hot-article）
+- diyicaijing：第一财经（route：/yicai/headline）
+
+## 开发（/rebang/dev）
+
+- journal-tech：技术期刊（disabled：本仓库未找到同名路由）
+- juejin：掘金
+    - all：综合（route：/juejin/trending/all/weekly）
+    - backend：后端（route：/juejin/trending/backend/weekly）
+    - frontend：前端（route：/juejin/trending/frontend/weekly）
+    - android：Android（route：/juejin/trending/android/weekly）
+    - ios：iOS（route：/juejin/trending/ios/weekly）
+    - ai：人工智能（route：/juejin/trending/ai/weekly）
+    - dev-tools：开发工具（route：/juejin/trending/freebie/weekly）
+    - code-life：代码人生（route：/juejin/trending/all/weekly）
+    - read：阅读（route：/juejin/trending/article/weekly）
+- infoq：InfoQ
+    - day：7天（route：/infoq/recommend）
+    - month：1个月（route：/infoq/recommend）
+    - year：6个月（route：/infoq/recommend）
+- v2ex：V2EX
+    - tech：技术（route：/v2ex/tab/tech）
+    - creative：创意（route：/v2ex/tab/creative）
+    - play：好玩（route：/v2ex/tab/play）
+    - apple：Apple（route：/v2ex/tab/apple）
+    - jobs：酷工作（route：/v2ex/tab/jobs）
+    - deals：交易（route：/v2ex/tab/deals）
+    - city：城市（route：/v2ex/tab/city）
+    - qna：问与答（route：/v2ex/tab/qna）
+    - hot：最热（route：/v2ex/tab/hot）
+    - all：全部（route：/v2ex/tab/all）
+    - r2：R2（route：/v2ex/tab/r2）
+- github：GitHub（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - all：全部（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - java：Java（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - python：Python（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - javascript：JS（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - typescript：TS（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - c：C（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - c1：C++（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - c2：C#（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - go：Go（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - php：PHP（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - rust：Rust（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - swift：Swift（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+    - vue：Vue（disabled：该节点需要 GITHUB_ACCESS_TOKEN，默认不启用）
+- csdn：CSDN（disabled：RSSHub 暂无“CSDN 热榜”类路由（仅支持指定博主））
