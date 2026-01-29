@@ -1,5 +1,6 @@
 import type { Context } from 'hono';
 
+import { journalTechBloggerSources } from '@/rebang/journal-tech-sources';
 import { aggregateToUiItems, clampLimit, fetchJsonFeed, resolveTabAndSub, toUiItems } from '@/rebang/utils';
 
 const seedBySub = (subKey: string | undefined) => {
@@ -57,7 +58,8 @@ export async function handler(ctx: Context) {
     }
 
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 15000);
+    const timeoutMs = tab.key === 'journal-tech' ? 60000 : 15000;
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
         if (tab.type === 'aggregate') {
             const sources = tab.aggregateSources ?? [];
@@ -100,7 +102,8 @@ export async function handler(ctx: Context) {
         }
 
         const feed = await fetchJsonFeed(origin, rsshubPath, limit, controller.signal);
-        const items = toUiItems(feed, { key: tab.key, name: tab.name }, limit);
+        const items = toUiItems(feed, { key: tab.key, name: tab.name }, limit, origin);
+        const sources = tab.key === 'journal-tech' ? journalTechBloggerSources : undefined;
 
         return ctx.json(
             {
@@ -110,6 +113,7 @@ export async function handler(ctx: Context) {
                 title: feed.title || tab.name,
                 link: feed.home_page_url,
                 items,
+                sources,
             },
             200
         );

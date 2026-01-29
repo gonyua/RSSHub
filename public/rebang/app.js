@@ -8,7 +8,7 @@ const STORAGE = {
 };
 
 const DEFAULTS = {
-    [STORAGE.theme]: 'system',
+    [STORAGE.theme]: 'light',
     [STORAGE.openLink]: 'new',
     [STORAGE.listDisplay]: 'full',
     [STORAGE.tabBarDefault]: 'collapsed',
@@ -80,6 +80,16 @@ const getPageByPath = (pathname) => {
 };
 
 const qs = (sel) => document.querySelector(sel);
+
+const setStatus = (text) => {
+    const el = qs('#rb-status');
+    if (!el) {
+        return;
+    }
+    const v = text ? String(text) : '';
+    el.textContent = v;
+    el.classList.toggle('hidden', !v);
+};
 
 const formatTime = (iso) => {
     if (!iso) {
@@ -159,18 +169,34 @@ const renderTabs = ({ menu, categoryKey, tabKey, subKey }) => {
     const expandedDefault = getSetting(STORAGE.tabBarDefault) === 'expanded';
     const isExpanded = localStorage.getItem('rebang:tabExpanded') ? localStorage.getItem('rebang:tabExpanded') === 'true' : expandedDefault;
 
-    tabsEl.classList.toggle('flex-wrap', isExpanded);
+    const expandBtnStub = qs('#rb-tab-expand');
+    const tabsContainer = qs('#rb-tabs-container');
+
+    // 状态切换：外置按钮 vs 内置按钮
+    if (isExpanded) {
+        tabsEl.classList.add('flex-wrap');
+        tabsContainer?.classList.remove('overflow-x-auto');
+        expandBtnStub?.classList.add('hidden');
+    } else {
+        tabsEl.classList.remove('flex-wrap');
+        tabsContainer?.classList.add('overflow-x-auto');
+        expandBtnStub?.classList.remove('hidden');
+    }
 
     const tabs = state.category.tabs || [];
     const activeKey = state.tab?.key;
 
-    tabsEl.innerHTML = tabs
+    let tabsHtml = tabs
         .map((t) => {
             const active = t.key === activeKey;
             const disabled = Boolean(t.disabled);
             const disabledReason = t.disabledReason ? String(t.disabledReason) : '';
             const icon = t.iconText ? `<span class="w-6 h-6 rounded-md grid place-items-center text-xs font-black ${active ? 'bg-[#2563eb] text-white' : 'rb-chip'}">${escapeHtml(t.iconText)}</span>` : '';
-            const cls = disabled ? 'opacity-50 cursor-not-allowed' : active ? 'bg-[#2563eb]/15 text-[color:var(--rb-text)]' : 'text-[color:var(--rb-text-2)] hover:text-[color:var(--rb-text)]';
+            const cls = disabled
+                ? 'opacity-50 cursor-not-allowed'
+                : active
+                  ? 'bg-[#2563eb]/15 text-[color:var(--rb-accent)] font-medium'
+                  : 'text-[color:var(--rb-text-2)] hover:text-[color:var(--rb-text)] hover:bg-[color:var(--rb-surface-2)]';
             return `
             <button type="button" data-rb-tab="${escapeHtml(t.key)}" data-rb-disabled="${disabled ? '1' : '0'}" data-rb-disabled-reason="${escapeHtml(disabledReason)}" class="shrink-0 inline-flex items-center gap-2 px-3 py-2 rounded-lg ${cls} rb-ring">
               ${icon}<span class="font-semibold">${escapeHtml(t.name)}</span>
@@ -179,12 +205,17 @@ const renderTabs = ({ menu, categoryKey, tabKey, subKey }) => {
         })
         .join('');
 
-    tabsEl.innerHTML += `
-      <button type="button" id="rb-tab-expand" class="ml-auto shrink-0 inline-flex items-center gap-2 px-3 py-2 rounded-lg text-[color:var(--rb-text-2)] hover:text-[color:var(--rb-text)] rb-ring">
-        <span>${isExpanded ? '收起' : '展开'}</span>
-        <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-      </button>
-    `;
+    // 如果是展开状态，把“收起”按钮加在最后
+    if (isExpanded) {
+        tabsHtml += `
+            <button type="button" id="rb-tab-collapse" class="ml-auto shrink-0 inline-flex items-center gap-1 pl-3 pr-1 py-2 rounded-lg text-[color:var(--rb-text-2)] hover:text-[color:var(--rb-text)] rb-ring">
+                <span>收起</span>
+                <svg viewBox="0 0 24 24" class="w-4 h-4 rotate-180" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+        `;
+    }
+
+    tabsEl.innerHTML = tabsHtml;
 
     nodeSelect.innerHTML = [
         '<option value="">全部节点</option>',
@@ -200,10 +231,7 @@ const renderTabs = ({ menu, categoryKey, tabKey, subKey }) => {
         btn.addEventListener('click', () => {
             if (btn.dataset.rbDisabled === '1') {
                 const reason = btn.dataset.rbDisabledReason || '该节点未启用';
-                const statusEl = qs('#rb-status');
-                if (statusEl) {
-                    statusEl.textContent = reason;
-                }
+                setStatus(reason);
                 return;
             }
             const nextTabKey = btn.dataset.rbTab;
@@ -211,11 +239,15 @@ const renderTabs = ({ menu, categoryKey, tabKey, subKey }) => {
         });
     }
 
-    qs('#rb-tab-expand')?.addEventListener('click', () => {
-        const next = !tabsEl.classList.contains('flex-wrap');
+    // 处理展开/收起点击
+    const handleToggle = () => {
+        const next = !isExpanded;
         localStorage.setItem('rebang:tabExpanded', String(next));
         renderTabs({ menu, categoryKey, tabKey: activeKey, subKey });
-    });
+    };
+
+    expandBtnStub?.addEventListener('click', handleToggle);
+    qs('#rb-tab-collapse')?.addEventListener('click', handleToggle);
 
     nodeSelect.addEventListener('change', () => {
         const v = nodeSelect.value || null;
@@ -257,10 +289,7 @@ const renderSubTabs = ({ menu, categoryKey, tabKey, subKey }) => {
         btn.addEventListener('click', () => {
             if (btn.dataset.rbDisabled === '1') {
                 const reason = btn.dataset.rbDisabledReason || '该子分类未启用';
-                const statusEl = qs('#rb-status');
-                if (statusEl) {
-                    statusEl.textContent = reason;
-                }
+                setStatus(reason);
                 return;
             }
             navigateWith({ sub: btn.dataset.rbSub }, { replace: false });
@@ -311,34 +340,58 @@ const renderItems = (items) => {
     const openLink = getSetting(STORAGE.openLink);
     const listDisplay = getSetting(STORAGE.listDisplay);
     const blockWords = getSetting(STORAGE.blockWords);
+    const journalTechActive = lastListState?.tabKey === 'journal-tech';
+    const journalTechExcluded = journalTechActive && journalTechTransientExcluded && journalTechTransientExcluded.size ? journalTechTransientExcluded : null;
 
-    const filtered = (items || []).filter((it) => {
-        if (!blockWords.length) {
-            return true;
-        }
-        return !blockWords.some((w) => w && it.title && String(it.title).includes(w));
-    });
+    const filtered = (items || [])
+        .filter((it) => {
+            if (!journalTechActive || !journalTechExcluded?.size) {
+                return true;
+            }
+            const sourceName = it.source?.name ? String(it.source.name) : '';
+            return !journalTechExcluded.has(sourceName);
+        })
+        .filter((it) => {
+            if (!blockWords.length) {
+                return true;
+            }
+            return !blockWords.some((w) => w && it.title && String(it.title).includes(w));
+        })
+        .map((it, idx) => ({ ...it, rank: idx + 1 }));
 
     listEl.innerHTML = filtered
         .map((it) => {
             const showImage = listDisplay !== 'noimage' && listDisplay !== 'compact';
             const showSummary = listDisplay !== 'compact';
-            const img = showImage && it.image ? `<img src="${escapeHtml(it.image)}" class="w-28 h-20 object-cover rounded-lg border border-[var(--rb-border)]" loading="lazy" />` : '';
-            const summary = showSummary && it.summary ? `<div class="mt-2 text-sm text-[color:var(--rb-text-2)] line-clamp-2">${escapeHtml(it.summary)}</div>` : '';
-            const meta = `<div class="mt-3 flex items-center gap-2 text-xs text-[color:var(--rb-muted)]">
-              <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md rb-chip text-[color:var(--rb-text-2)] font-semibold">${escapeHtml(it.source?.name || '')}</span>
-              <span>${escapeHtml(formatTime(it.datePublished) || '')}</span>
-            </div>`;
+            const summary = showSummary && it.summary ? `<div class="mt-1.5 text-sm text-[color:var(--rb-text-2)] line-clamp-2">${escapeHtml(it.summary)}</div>` : '';
+
+            const sourceName = it.source?.name ? String(it.source.name) : '';
+            const published = formatTime(it.datePublished);
+            const meta =
+                sourceName || published
+                    ? `<div class="mt-2 flex items-center gap-2 text-xs text-[color:var(--rb-muted)]">
+              ${sourceName ? `<span>${escapeHtml(sourceName)}</span>` : ''}
+              ${sourceName && published ? '<span class="opacity-40">·</span>' : ''}
+              ${published ? `<span>${escapeHtml(published)}</span>` : ''}
+            </div>`
+                    : '';
+
+            const thumb =
+                showImage && it.image
+                    ? `<div class="shrink-0 w-40 h-24 rounded bg-[color:var(--rb-surface-2)] overflow-hidden flex items-center justify-center">
+                    <img src="${escapeHtml(it.image)}" class="w-full h-full object-cover rounded" loading="lazy" referrerpolicy="no-referrer" />
+                  </div>`
+                    : '';
             const target = openLink === 'new' ? ' target="_blank" rel="noreferrer noopener"' : '';
             return `
-            <li class="px-4 py-4 flex gap-4">
+            <li class="px-3 py-3 flex gap-3">
               <div class="w-6 text-[#f97316] font-extrabold">${escapeHtml(it.rank)}</div>
               <div class="flex-1 min-w-0">
-                <a class="rb-link font-bold text-base leading-6" href="${escapeHtml(it.link)}"${target}>${escapeHtml(it.title)}</a>
+                <a class="rb-link font-semibold text-[15px] leading-6" href="${escapeHtml(it.link)}"${target}>${escapeHtml(it.title)}</a>
                 ${summary}
                 ${meta}
               </div>
-              ${img ? `<div class="shrink-0">${img}</div>` : ''}
+              ${thumb}
             </li>
           `;
         })
@@ -346,10 +399,7 @@ const renderItems = (items) => {
 };
 
 const fetchItems = async ({ categoryKey, tabKey, subKey }) => {
-    const statusEl = qs('#rb-status');
-    if (statusEl) {
-        statusEl.textContent = '加载中...';
-    }
+    setStatus('加载中...');
 
     const url = new URL('/api/rebang/items', window.location.origin);
     url.searchParams.set('category', categoryKey);
@@ -369,18 +419,209 @@ const fetchItems = async ({ categoryKey, tabKey, subKey }) => {
 };
 
 let lastListData = null;
+let lastListState = null;
+let journalTechFilterState = null;
+let journalTechTransientExcluded = null;
+
+const getJournalTechExcludedSet = (sources) => {
+    if (!journalTechTransientExcluded?.size) {
+        return new Set();
+    }
+    return new Set([...journalTechTransientExcluded].filter((name) => sources.includes(name)));
+};
+
+const applyJournalTechExcludedFilter = ({ sources, excludedSources }) => {
+    const allowed = new Set(sources);
+    const normalized = [...excludedSources].map(String).filter((name) => allowed.has(name));
+    journalTechTransientExcluded = normalized.length ? new Set(normalized) : null;
+};
+
+const closeJournalTechSourcePanel = () => {
+    qs('#rb-journal-source-filter-panel')?.classList.add('hidden');
+};
+
+const isSetEqual = (a, b) => {
+    if (a.size !== b.size) {
+        return false;
+    }
+    for (const x of a) {
+        if (!b.has(x)) {
+            return false;
+        }
+    }
+    return true;
+};
+
+const renderJournalTechSourceFilter = ({ tabKey, items, sources: allSources }) => {
+    const container = qs('#rb-journal-source-filter');
+    const labelEl = qs('#rb-journal-source-filter-label');
+    const btn = qs('#rb-journal-source-filter-btn');
+    const panel = qs('#rb-journal-source-filter-panel');
+    const listEl = qs('#rb-journal-source-filter-list');
+    const toggleAllBtn = qs('#rb-journal-source-filter-toggle-all');
+    const saveBtn = qs('#rb-journal-source-filter-save');
+    if (!container || !labelEl || !btn || !panel || !listEl || !toggleAllBtn || !saveBtn) {
+        return;
+    }
+
+    if (tabKey !== 'journal-tech') {
+        container.classList.add('hidden');
+        closeJournalTechSourcePanel();
+        return;
+    }
+
+    container.classList.remove('hidden');
+
+    const derivedSources = [...new Set((items || []).map((it) => (it.source?.name ? String(it.source.name) : '')).filter(Boolean))];
+    const sourcesRaw = Array.isArray(allSources) && allSources.length ? allSources.map((s) => String(s.name || s)).filter(Boolean) : derivedSources;
+    const sources = [...new Set(sourcesRaw)].toSorted((a, b) => a.localeCompare(b, 'zh-Hans-CN'));
+
+    const savedExcluded = getJournalTechExcludedSet(sources);
+    const stateKey = sources.join('\u0000');
+    if (!journalTechFilterState || journalTechFilterState.key !== stateKey) {
+        journalTechFilterState = { key: stateKey, sources, savedExcluded, draftExcluded: new Set(savedExcluded) };
+    } else {
+        journalTechFilterState.sources = sources;
+        journalTechFilterState.savedExcluded = savedExcluded;
+    }
+
+    const applyFilterUiState = () => {
+        const { savedExcluded, draftExcluded } = journalTechFilterState;
+        const dirty = !isSetEqual(savedExcluded, draftExcluded);
+        const excludedCount = draftExcluded.size;
+        const baseText = excludedCount ? `已排除 ${excludedCount} 位博主` : '全部博主';
+        labelEl.textContent = dirty ? `${baseText}*` : baseText;
+        toggleAllBtn.textContent = excludedCount === 0 ? '取消全选' : '全选';
+        saveBtn.disabled = !dirty;
+    };
+
+    applyFilterUiState();
+
+    listEl.innerHTML = sources
+        .map((name) => {
+            const checked = !journalTechFilterState.draftExcluded.has(name);
+            return `
+        <label class="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-[color:var(--rb-surface-2)] rb-ring cursor-pointer">
+          <input type="checkbox" data-rb-journal-source="${escapeHtml(name)}" class="w-4 h-4" ${checked ? 'checked' : ''} />
+          <span class="text-sm">${escapeHtml(name)}</span>
+        </label>
+      `;
+        })
+        .join('');
+
+    if (btn.dataset.rbBound !== '1') {
+        btn.dataset.rbBound = '1';
+        btn.addEventListener('click', () => {
+            panel.classList.toggle('hidden');
+        });
+        document.addEventListener('click', (e) => {
+            const t = e.target;
+            if (!(t instanceof Node)) {
+                return;
+            }
+            if (!container.contains(t)) {
+                closeJournalTechSourcePanel();
+            }
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeJournalTechSourcePanel();
+            }
+        });
+    }
+
+    if (listEl.dataset.rbBound !== '1') {
+        listEl.dataset.rbBound = '1';
+        listEl.addEventListener('change', (e) => {
+            if (!journalTechFilterState) {
+                return;
+            }
+            const t = e.target;
+            if (!(t instanceof HTMLInputElement) || t.type !== 'checkbox') {
+                return;
+            }
+            const name = t.dataset.rbJournalSource;
+            if (!name) {
+                return;
+            }
+            if (t.checked) {
+                journalTechFilterState.draftExcluded.delete(name);
+            } else {
+                journalTechFilterState.draftExcluded.add(name);
+            }
+            applyFilterUiState();
+        });
+    }
+
+    if (toggleAllBtn.dataset.rbBound !== '1') {
+        toggleAllBtn.dataset.rbBound = '1';
+        toggleAllBtn.addEventListener('click', () => {
+            if (!journalTechFilterState) {
+                return;
+            }
+            const { sources, draftExcluded } = journalTechFilterState;
+            journalTechFilterState.draftExcluded = draftExcluded.size === 0 ? new Set(sources) : new Set();
+            for (const input of listEl.querySelectorAll('input[type="checkbox"][data-rb-journal-source]')) {
+                const name = input.dataset.rbJournalSource;
+                input.checked = name ? !journalTechFilterState.draftExcluded.has(name) : input.checked;
+            }
+            applyFilterUiState();
+        });
+    }
+
+    if (saveBtn.dataset.rbBound !== '1') {
+        saveBtn.dataset.rbBound = '1';
+        saveBtn.addEventListener('click', () => {
+            const listEl = qs('#rb-journal-source-filter-list');
+            if (!listEl || !journalTechFilterState) {
+                return;
+            }
+            applyJournalTechExcludedFilter({ sources: journalTechFilterState.sources, excludedSources: journalTechFilterState.draftExcluded });
+            journalTechFilterState.savedExcluded = new Set(journalTechFilterState.draftExcluded);
+            applyFilterUiState();
+            closeJournalTechSourcePanel();
+            rerenderListFromLastData();
+        });
+    }
+};
+
+const rerenderListFromLastData = () => {
+    if (!lastListData) {
+        return;
+    }
+
+    const input = qs('#rb-search');
+    const q = input ? input.value.trim().toLowerCase() : '';
+
+    let items = lastListData.items || [];
+    if (q) {
+        items = items.filter(
+            (it) =>
+                String(it.title).toLowerCase().includes(q) ||
+                String(it.summary || '')
+                    .toLowerCase()
+                    .includes(q)
+        );
+    }
+
+    renderItems(items);
+};
 
 const refreshList = async ({ menu, categoryKey, tabKey, subKey }) => {
     const state = normalizeState({ menu, categoryKey, tabKey, subKey });
     if (!state?.tab) {
+        renderJournalTechSourceFilter({ tabKey: null, items: [], sources: null });
         renderItems([]);
-        qs('#rb-status').textContent = '暂无节点';
+        setStatus('暂无节点');
         return;
     }
 
+    lastListState = { categoryKey: state.category.key, tabKey: state.tab.key, subKey: state.subKey };
+    renderJournalTechSourceFilter({ tabKey: state.tab.key, items: [], sources: lastListData?.sources });
+
     if (state.tab.disabled) {
         renderItems([]);
-        qs('#rb-status').textContent = state.tab.disabledReason || '该节点未启用';
+        setStatus(state.tab.disabledReason || '该节点未启用');
         return;
     }
 
@@ -388,7 +629,7 @@ const refreshList = async ({ menu, categoryKey, tabKey, subKey }) => {
         const matchedSub = state.tab.subTabs.find((s) => s.key === state.subKey);
         if (matchedSub?.disabled) {
             renderItems([]);
-            qs('#rb-status').textContent = matchedSub.disabledReason || '该子分类未启用';
+            setStatus(matchedSub.disabledReason || '该子分类未启用');
             return;
         }
     }
@@ -396,10 +637,11 @@ const refreshList = async ({ menu, categoryKey, tabKey, subKey }) => {
     try {
         const data = await fetchItems({ categoryKey: state.category.key, tabKey: state.tab.key, subKey: state.subKey });
         lastListData = data;
+        renderJournalTechSourceFilter({ tabKey: state.tab.key, items: data.items, sources: data.sources });
         renderItems(data.items);
-        qs('#rb-status').textContent = data.errors?.length ? '部分来源加载失败' : '';
+        setStatus(data.errors?.length ? '部分来源加载失败' : '');
     } catch (error) {
-        qs('#rb-status').textContent = error instanceof Error ? error.message : '加载失败';
+        setStatus(error instanceof Error ? error.message : '加载失败');
         renderItems([]);
     }
 };
@@ -505,9 +747,7 @@ const renderSettings = (menu) => {
         ],
         onChange: (v) => {
             setSetting(STORAGE.listDisplay, v);
-            if (lastListData) {
-                renderItems(lastListData.items);
-            }
+            rerenderListFromLastData();
         },
     });
 
@@ -571,22 +811,7 @@ const bindSearch = () => {
         return;
     }
     input.addEventListener('input', () => {
-        if (!lastListData) {
-            return;
-        }
-        const q = input.value.trim().toLowerCase();
-        if (!q) {
-            renderItems(lastListData.items);
-            return;
-        }
-        const filtered = lastListData.items.filter(
-            (it) =>
-                String(it.title).toLowerCase().includes(q) ||
-                String(it.summary || '')
-                    .toLowerCase()
-                    .includes(q)
-        );
-        renderItems(filtered.map((it, idx) => ({ ...it, rank: idx + 1 })));
+        rerenderListFromLastData();
     });
 };
 

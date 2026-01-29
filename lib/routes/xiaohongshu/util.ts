@@ -283,4 +283,4 @@ async function checkCookie() {
     return res.code === 0 && !!res.data.user_id;
 }
 
-export { checkCookie, formatNote, formatText, getBoard, getFullNote, getUser, getUserWithCookie, renderNotesFulltext };
+export { checkCookie, extractInitialState, formatNote, formatText, getBoard, getFullNote, getHeaders, getUser, getUserWithCookie, renderNotesFulltext };

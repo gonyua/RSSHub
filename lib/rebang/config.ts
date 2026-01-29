@@ -57,14 +57,14 @@ const makeDisabledSubTab = (key: string, name: string, disabledReason: string): 
     disabledReason,
 });
 
-const makeDisabledTab = (key: string, name: string, iconText: string, disabledReason: string): RebangTab => ({
-    key,
-    name,
-    iconText,
-    type: 'feed',
-    disabled: true,
-    disabledReason,
-});
+// const makeDisabledTab = (key: string, name: string, iconText: string, disabledReason: string): RebangTab => ({
+//     key,
+//     name,
+//     iconText,
+//     type: 'feed',
+//     disabled: true,
+//     disabledReason,
+// });
 
 const aggregateSources: RebangAggregateSource[] = [
     { key: 'zhihu', name: '知乎', rsshubPath: '/zhihu/hot' },
@@ -92,9 +92,9 @@ const hupuSubTabs: RebangSubTab[] = [
 const weiboSubTabs: RebangSubTab[] = [{ key: 'search', name: '热搜', rsshubPath: '/weibo/search/hot' }, makeDisabledSubTab('ent', '文娱', 'RSSHub 暂无与该子榜单等价路由')];
 
 const doubanCommunitySubTabs: RebangSubTab[] = [
-    makeDisabledSubTab('discussion', '精选讨论', 'RSSHub 暂无“豆瓣社区精选讨论”类路由'),
-    makeDisabledSubTab('topic', '热门话题', 'RSSHub 暂无“豆瓣社区热门话题”类路由'),
-    makeDisabledSubTab('group', '发现小组', 'RSSHub 暂无“豆瓣社区发现小组”类路由'),
+    { key: 'discussion', name: '精选讨论', rsshubPath: '/douban/community/discussion' },
+    { key: 'topic', name: '热门话题', rsshubPath: '/douban/community/topic' },
+    { key: 'group', name: '发现小组', rsshubPath: '/douban/community/group' },
 ];
 
 const huxiuSubTabs: RebangSubTab[] = [
@@ -110,7 +110,7 @@ const sspaiSubTabs: RebangSubTab[] = [
 
 const thepaperSubTabs: RebangSubTab[] = [{ key: 'hot', name: '热榜', rsshubPath: '/thepaper/sidebar/hotNews' }];
 
-const xiaohongshuSubTabs: RebangSubTab[] = [makeDisabledSubTab('hot-search', '热点', 'RSSHub 暂无“小红书热点榜”类路由')];
+const xiaohongshuSubTabs: RebangSubTab[] = [{ key: 'hot-search', name: '热点', rsshubPath: '/xiaohongshu/hot-search' }];
 
 const kr36SubTabs: RebangSubTab[] = [
     { key: 'hotlist', name: '热榜', rsshubPath: '/36kr/recommend', disabledReason: 'RSSHub 无“36氪热榜”直出路由，此处用推荐近似' },
@@ -166,12 +166,12 @@ const wereadSubTabs: RebangSubTab[] = [
     { key: 'hot_search', name: '热搜榜', rsshubPath: '/qq/weread/hot_search' },
 ];
 
-const baiduTiebaSubTabs: RebangSubTab[] = [makeDisabledSubTab('topic', '热门话题', 'RSSHub 暂无“贴吧热门话题榜”类路由')];
+const baiduTiebaSubTabs: RebangSubTab[] = [{ key: 'topic', name: '热门话题', rsshubPath: '/baidu/tieba/hottopic' }];
 
 const pojieSubTabs: RebangSubTab[] = [
-    makeDisabledSubTab('today', '今日', '本仓库未找到该站点路由'),
-    makeDisabledSubTab('thisweek', '本周', '本仓库未找到该站点路由'),
-    makeDisabledSubTab('thismonth', '本月', '本仓库未找到该站点路由'),
+    { key: 'today', name: '今日', rsshubPath: '/52pojie/hot/today' },
+    { key: 'thisweek', name: '本周', rsshubPath: '/52pojie/hot/thisweek' },
+    { key: 'thismonth', name: '本月', rsshubPath: '/52pojie/hot/thismonth' },
 ];
 
 const guanchaUserSubTabs: RebangSubTab[] = [
@@ -274,24 +274,24 @@ const gelonghuiSubTabs: RebangSubTab[] = [
 ];
 
 const kdsSubTabs: RebangSubTab[] = [
-    makeDisabledSubTab('hot-today', '今日', '本仓库未找到 kds 路由'),
-    makeDisabledSubTab('hot-weekly', '本周', '本仓库未找到 kds 路由'),
-    makeDisabledSubTab('hot-monthly', '本月', '本仓库未找到 kds 路由'),
+    { key: 'hot-today', name: '今日', rsshubPath: '/kds/hot/today' },
+    { key: 'hot-weekly', name: '本周', rsshubPath: '/kds/hot/weekly', disabledReason: 'RSSHub 无官方“本周热帖”接口，此处基于最新主题按回帖/浏览近似排序' },
+    { key: 'hot-monthly', name: '本月', rsshubPath: '/kds/hot/monthly', disabledReason: 'RSSHub 无官方“本月热帖”接口，此处基于最新主题按回帖/浏览近似排序' },
 ];
 
 const apprcnSubTabs: RebangSubTab[] = [
-    makeDisabledSubTab('all', '全部', '本仓库未找到 apprcn 路由'),
-    makeDisabledSubTab('ios', 'iOS', '本仓库未找到 apprcn 路由'),
-    makeDisabledSubTab('android', '安卓', '本仓库未找到 apprcn 路由'),
-    makeDisabledSubTab('game', '游戏', '本仓库未找到 apprcn 路由'),
-    makeDisabledSubTab('mac', 'Mac', '本仓库未找到 apprcn 路由'),
-    makeDisabledSubTab('windows', 'Windows', '本仓库未找到 apprcn 路由'),
+    { key: 'all', name: '全部', rsshubPath: '/apprcn' },
+    { key: 'ios', name: 'iOS', rsshubPath: '/apprcn/ios' },
+    { key: 'android', name: '安卓', rsshubPath: '/apprcn/android' },
+    { key: 'game', name: '游戏', rsshubPath: '/apprcn/game' },
+    { key: 'mac', name: 'Mac', rsshubPath: '/apprcn/mac' },
+    { key: 'windows', name: 'Windows', rsshubPath: '/apprcn/windows' },
 ];
 
 const acfunSubTabs: RebangSubTab[] = [
-    makeDisabledSubTab('day', '今日', 'RSSHub 暂无“AcFun 榜单”类路由'),
-    makeDisabledSubTab('three', '三日', 'RSSHub 暂无“AcFun 榜单”类路由'),
-    makeDisabledSubTab('week', '本周', 'RSSHub 暂无“AcFun 榜单”类路由'),
+    { key: 'day', name: '今日', rsshubPath: '/acfun/rank/day' },
+    { key: 'three', name: '三日', rsshubPath: '/acfun/rank/three' },
+    { key: 'week', name: '本周', rsshubPath: '/acfun/rank/week' },
 ];
 
 export const rebangMenu: RebangMenu = {
@@ -328,15 +328,13 @@ export const rebangMenu: RebangMenu = {
                     type: 'feed',
                     defaultSubTabKey: 'discussion',
                     subTabs: doubanCommunitySubTabs,
-                    disabled: true,
-                    disabledReason: 'RSSHub 暂无“豆瓣社区热榜/发现小组/热门话题”类路由',
                 },
                 { key: 'huxiu', name: '虎嗅', iconText: '嗅', type: 'feed', defaultSubTabKey: 'hot', subTabs: huxiuSubTabs },
                 { key: 'sspai', name: '少数派', iconText: '派', type: 'feed', defaultSubTabKey: 'recommend', subTabs: sspaiSubTabs },
                 { key: 'thepaper', name: '澎湃新闻', iconText: '澎', type: 'feed', defaultSubTabKey: 'hot', subTabs: thepaperSubTabs },
-                { key: 'xiaohongshu', name: '小红书', iconText: '书', type: 'feed', defaultSubTabKey: 'hot-search', subTabs: xiaohongshuSubTabs, disabled: true, disabledReason: 'RSSHub 暂无“小红书热点榜”类路由' },
+                { key: 'xiaohongshu', name: '小红书', iconText: '书', type: 'feed', defaultSubTabKey: 'hot-search', subTabs: xiaohongshuSubTabs },
                 { key: '36kr', name: '36氪', iconText: '氪', type: 'feed', defaultSubTabKey: 'hotlist', subTabs: kr36SubTabs },
-                makeDisabledTab('toutiao', '今日头条', '头', 'RSSHub 暂无“今日头条热榜”类路由'),
+                { key: 'toutiao', name: '今日头条', iconText: '头', type: 'feed', rsshubPath: '/toutiao/hot' },
                 { key: 'ifanr', name: '爱范儿', iconText: '爱', type: 'feed', rsshubPath: '/ifanr/index' },
                 { key: 'douban-media', name: '豆瓣书影音', iconText: '豆', type: 'feed', defaultSubTabKey: 'movie', subTabs: doubanMediaSubTabs },
                 { key: 'smzdm', name: '什么值得买', iconText: '值', type: 'feed', defaultSubTabKey: 'post', subTabs: smzdmSubTabs },
@@ -345,20 +343,20 @@ export const rebangMenu: RebangMenu = {
                 { key: 'ne-news', name: '网易新闻', iconText: '易', type: 'feed', defaultSubTabKey: 'htd', subTabs: neteaseNewsSubTabs },
                 { key: 'weread', name: '微信读书', iconText: '读', type: 'feed', defaultSubTabKey: 'rising', subTabs: wereadSubTabs },
                 { key: 'zhihu-daily', name: '知乎日报', iconText: '报', type: 'feed', rsshubPath: '/zhihu/daily' },
-                { key: 'baidu-tieba', name: '百度贴吧', iconText: '吧', type: 'feed', defaultSubTabKey: 'topic', subTabs: baiduTiebaSubTabs, disabled: true, disabledReason: 'RSSHub 暂无“贴吧热门话题榜”类路由' },
-                { key: '52pojie', name: '吾爱破解', iconText: '破', type: 'feed', defaultSubTabKey: 'today', subTabs: pojieSubTabs, disabled: true, disabledReason: '本仓库未找到该站点路由' },
+                { key: 'baidu-tieba', name: '百度贴吧', iconText: '吧', type: 'feed', defaultSubTabKey: 'topic', subTabs: baiduTiebaSubTabs },
+                { key: '52pojie', name: '吾爱破解', iconText: '破', type: 'feed', defaultSubTabKey: 'today', subTabs: pojieSubTabs },
                 { key: 'guancha-user', name: '观风闻', iconText: '观', type: 'feed', defaultSubTabKey: 'hot-3', subTabs: guanchaUserSubTabs },
                 { key: 'xueqiu', name: '雪球', iconText: '球', type: 'feed', defaultSubTabKey: 'topic', subTabs: xueqiuSubTabs },
                 { key: 'landian', name: '蓝点网', iconText: '蓝', type: 'feed', defaultSubTabKey: 'article', subTabs: landianSubTabs },
-                makeDisabledTab('appinn', '小众软件', '众', '本仓库未找到 appinn 路由'),
-                { key: 'apprcn', name: '反斗限免', iconText: '免', type: 'feed', defaultSubTabKey: 'all', subTabs: apprcnSubTabs, disabled: true, disabledReason: '本仓库未找到 apprcn 路由' },
-                makeDisabledTab('zhibo8', '直播吧', '播', 'RSSHub 暂无“直播吧热榜”类路由（仅有论坛/更多列表）'),
-                makeDisabledTab('douyin', '抖音', '抖', 'RSSHub 暂无“抖音热榜”类路由'),
+                { key: 'appinn', name: '小众软件', iconText: '众', type: 'feed', rsshubPath: '/appinn' },
+                { key: 'apprcn', name: '反斗限免', iconText: '免', type: 'feed', defaultSubTabKey: 'all', subTabs: apprcnSubTabs },
+                { key: 'zhibo8', name: '直播吧', iconText: '播', type: 'feed', rsshubPath: '/zhibo8/more/other', disabledReason: 'RSSHub 无“热榜”直出，此处用滚动新闻（综合）近似' },
+                { key: 'douyin', name: '抖音', iconText: '抖', type: 'feed', rsshubPath: '/douyin/hot-search' },
                 { key: 'bilibili', name: '哔哩哔哩', iconText: 'B', type: 'feed', defaultSubTabKey: 'popular', subTabs: bilibiliSubTabs },
                 { key: 'xmyp', name: '小米有品', iconText: '米', type: 'feed', defaultSubTabKey: 'zhongchou', subTabs: xmypSubTabs },
                 { key: 'gamersky', name: '游民星空', iconText: '游', type: 'feed', defaultSubTabKey: 'spg', subTabs: gamerskySubTabs },
                 { key: 'juejin', name: '掘金', iconText: '掘', type: 'feed', defaultSubTabKey: 'all', subTabs: juejinSubTabs },
-                makeDisabledTab('journal-tech', '技术期刊', '刊', '本仓库未找到同名路由'),
+                { key: 'journal-tech', name: '技术期刊', iconText: '刊', type: 'feed', rsshubPath: '/journal-tech' },
                 { key: 'github', name: 'GitHub', iconText: 'GH', type: 'feed', defaultSubTabKey: 'all', subTabs: githubSubTabs, disabled: true, disabledReason: '该节点需要 GITHUB_ACCESS_TOKEN，默认不启用' },
             ],
         },
@@ -373,7 +371,7 @@ export const rebangMenu: RebangMenu = {
                 { key: 'ifanr', name: '爱范儿', iconText: '爱', type: 'feed', rsshubPath: '/ifanr/index' },
                 { key: 'landian', name: '蓝点网', iconText: '蓝', type: 'feed', defaultSubTabKey: 'article', subTabs: landianSubTabs },
                 { key: '36kr', name: '36氪', iconText: '氪', type: 'feed', defaultSubTabKey: 'hotlist', subTabs: kr36SubTabs },
-                { key: '52pojie', name: '吾爱破解', iconText: '破', type: 'feed', defaultSubTabKey: 'today', subTabs: pojieSubTabs, disabled: true, disabledReason: '本仓库未找到该站点路由' },
+                { key: '52pojie', name: '吾爱破解', iconText: '破', type: 'feed', defaultSubTabKey: 'today', subTabs: pojieSubTabs },
                 { key: 'huxiu', name: '虎嗅', iconText: '嗅', type: 'feed', defaultSubTabKey: 'hot', subTabs: huxiuSubTabs },
                 { key: 'guokr', name: '果壳', iconText: '壳', type: 'feed', rsshubPath: '/guokr/scientific' },
             ],
@@ -387,16 +385,16 @@ export const rebangMenu: RebangMenu = {
                 { key: 'weibo', name: '微博', iconText: '微', type: 'feed', defaultSubTabKey: 'search', subTabs: weiboSubTabs },
                 { key: 'hupu', name: '虎扑', iconText: '虎', type: 'feed', defaultSubTabKey: 'all-ent', subTabs: hupuSubTabs },
                 { key: 'douban-media', name: '豆瓣书影音', iconText: '豆', type: 'feed', defaultSubTabKey: 'movie', subTabs: doubanMediaSubTabs },
-                { key: 'xiaohongshu', name: '小红书', iconText: '书', type: 'feed', defaultSubTabKey: 'hot-search', subTabs: xiaohongshuSubTabs, disabled: true, disabledReason: 'RSSHub 暂无“小红书热点榜”类路由' },
-                { key: 'baidu-tieba', name: '百度贴吧', iconText: '吧', type: 'feed', defaultSubTabKey: 'topic', subTabs: baiduTiebaSubTabs, disabled: true, disabledReason: 'RSSHub 暂无“贴吧热门话题榜”类路由' },
+                { key: 'xiaohongshu', name: '小红书', iconText: '书', type: 'feed', defaultSubTabKey: 'hot-search', subTabs: xiaohongshuSubTabs },
+                { key: 'baidu-tieba', name: '百度贴吧', iconText: '吧', type: 'feed', defaultSubTabKey: 'topic', subTabs: baiduTiebaSubTabs },
                 { key: 'nga', name: 'NGA社区', iconText: 'N', type: 'feed', rsshubPath: '/nga/forum/489' },
                 { key: 'gamersky', name: '游民星空', iconText: '游', type: 'feed', defaultSubTabKey: 'spg', subTabs: gamerskySubTabs },
                 { key: 'penti', name: '喷嚏网', iconText: '喷', type: 'feed', defaultSubTabKey: 'tugua', subTabs: pentiSubTabs },
-                makeDisabledTab('shadiao-news', '沙雕新闻', '沙', '本仓库未找到该站点路由'),
+                { key: 'shadiao-news', name: '沙雕新闻', iconText: '沙', type: 'feed', rsshubPath: '/shadiao' },
                 { key: 'bilibili', name: '哔哩哔哩', iconText: 'B', type: 'feed', defaultSubTabKey: 'popular', subTabs: bilibiliSubTabs },
-                makeDisabledTab('douyin', '抖音', '抖', 'RSSHub 暂无“抖音热榜”类路由'),
-                makeDisabledTab('kuaishou', '快手', '快', 'RSSHub 暂无“快手热榜”类路由（仅有 profile）'),
-                { key: 'acfun', name: 'AcFun', iconText: 'A', type: 'feed', defaultSubTabKey: 'day', subTabs: acfunSubTabs, disabled: true, disabledReason: 'RSSHub 暂无“AcFun 榜单”类路由' },
+                { key: 'douyin', name: '抖音', iconText: '抖', type: 'feed', rsshubPath: '/douyin/hot-search' },
+                { key: 'kuaishou', name: '快手', iconText: '快', type: 'feed', rsshubPath: '/kuaishou/hot' },
+                { key: 'acfun', name: 'AcFun', iconText: 'A', type: 'feed', defaultSubTabKey: 'day', subTabs: acfunSubTabs },
             ],
         },
         {
@@ -412,14 +410,12 @@ export const rebangMenu: RebangMenu = {
                     type: 'feed',
                     defaultSubTabKey: 'discussion',
                     subTabs: doubanCommunitySubTabs,
-                    disabled: true,
-                    disabledReason: 'RSSHub 暂无“豆瓣社区热榜/发现小组/热门话题”类路由',
                 },
                 { key: 'hupu', name: '虎扑', iconText: '虎', type: 'feed', defaultSubTabKey: 'all-gambia', subTabs: hupuSubTabs },
-                { key: 'baidu-tieba', name: '百度贴吧', iconText: '吧', type: 'feed', defaultSubTabKey: 'topic', subTabs: baiduTiebaSubTabs, disabled: true, disabledReason: 'RSSHub 暂无“贴吧热门话题榜”类路由' },
+                { key: 'baidu-tieba', name: '百度贴吧', iconText: '吧', type: 'feed', defaultSubTabKey: 'topic', subTabs: baiduTiebaSubTabs },
                 { key: 'guancha-user', name: '观风闻', iconText: '观', type: 'feed', defaultSubTabKey: 'hot-3', subTabs: guanchaUserSubTabs },
                 { key: 'nga', name: 'NGA社区', iconText: 'N', type: 'feed', rsshubPath: '/nga/forum/489' },
-                { key: 'kds', name: '宽带山', iconText: '宽', type: 'feed', defaultSubTabKey: 'hot-today', subTabs: kdsSubTabs, disabled: true, disabledReason: '本仓库未找到 kds 路由' },
+                { key: 'kds', name: '宽带山', iconText: '宽', type: 'feed', defaultSubTabKey: 'hot-today', subTabs: kdsSubTabs },
                 { key: 'v2ex', name: 'V2EX', iconText: 'V', type: 'feed', defaultSubTabKey: 'hot', subTabs: v2exSubTabs },
             ],
         },
@@ -430,7 +426,7 @@ export const rebangMenu: RebangMenu = {
             defaultTabKey: 'xueqiu',
             tabs: [
                 { key: 'xueqiu', name: '雪球', iconText: '球', type: 'feed', defaultSubTabKey: 'topic', subTabs: xueqiuSubTabs },
-                makeDisabledTab('eastmoney', '东方财富', '东', 'RSSHub 暂无“东方财富热榜”类路由（多为研报/用户内容）'),
+                { key: 'eastmoney', name: '东方财富', iconText: '东', type: 'feed', rsshubPath: '/eastmoney/hot/stockbar' },
                 { key: 'sina-fin', name: '新浪财经', iconText: '新', type: 'feed', defaultSubTabKey: 'all', subTabs: sinaFinSubTabs },
                 { key: 'gelonghui', name: '格隆汇', iconText: '格', type: 'feed', defaultSubTabKey: 'recommend', subTabs: gelonghuiSubTabs },
                 { key: 'diyicaijing', name: '第一财经', iconText: '一', type: 'feed', rsshubPath: '/yicai/headline' },
@@ -442,12 +438,12 @@ export const rebangMenu: RebangMenu = {
             path: '/rebang/dev',
             defaultTabKey: 'juejin',
             tabs: [
-                makeDisabledTab('journal-tech', '技术期刊', '刊', '本仓库未找到同名路由'),
+                { key: 'journal-tech', name: '技术期刊', iconText: '刊', type: 'feed', rsshubPath: '/journal-tech' },
                 { key: 'juejin', name: '掘金', iconText: '掘', type: 'feed', defaultSubTabKey: 'all', subTabs: juejinSubTabs },
                 { key: 'infoq', name: 'InfoQ', iconText: 'IQ', type: 'feed', defaultSubTabKey: 'day', subTabs: infoqSubTabs },
                 { key: 'v2ex', name: 'V2EX', iconText: 'V', type: 'feed', defaultSubTabKey: 'hot', subTabs: v2exSubTabs },
                 { key: 'github', name: 'GitHub', iconText: 'GH', type: 'feed', defaultSubTabKey: 'all', subTabs: githubSubTabs, disabled: true, disabledReason: '该节点需要 GITHUB_ACCESS_TOKEN，默认不启用' },
-                makeDisabledTab('csdn', 'CSDN', 'C', 'RSSHub 暂无“CSDN 热榜”类路由（仅支持指定博主）'),
+                { key: 'csdn', name: 'CSDN', iconText: 'C', type: 'feed', rsshubPath: '/csdn/rank/hot' },
             ],
         },
     ],

@@ -24,7 +24,8 @@ const rebangAppJsPath = path.join(__dirname, 'assets/rebang/app.js');
 const rebangAppJs: Handler = async (ctx) => {
     const body = await readFile(rebangAppJsPath, 'utf8');
     ctx.header('Content-Type', 'text/javascript; charset=utf-8');
-    ctx.header('Cache-Control', 'public, max-age=3600');
+    const isProd = config.isPackage || (process.env.NODE_ENV || process.env.VERCEL_ENV) === 'production';
+    ctx.header('Cache-Control', isProd ? 'public, max-age=3600' : 'no-store');
     return ctx.body(body);
 };
 

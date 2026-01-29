@@ -12,6 +12,7 @@ type JsonFeedItem = {
     summary?: string;
     image?: string;
     date_published?: string;
+    tags?: string[];
 };
 
 type JsonFeed = {
@@ -40,6 +41,10 @@ export type RebangUiResponse = {
     title: string;
     link?: string;
     items: RebangUiItem[];
+    sources?: Array<{
+        name: string;
+        homepage: string;
+    }>;
     errors?: Array<{
         sourceKey: string;
         message: string;
@@ -116,6 +121,32 @@ export const extractFirstImageUrl = (html: string | undefined) => {
     return m?.[1];
 };
 
+const normalizeMaybeUrl = (value: string | undefined, baseUrl: string): string | undefined => {
+    if (!value) {
+        return;
+    }
+    if (value.startsWith('//')) {
+        return `https:${value}`;
+    }
+    if (value.startsWith('/')) {
+        try {
+            return new URL(value, baseUrl).toString();
+        } catch {
+            return;
+        }
+    }
+    return value;
+};
+
+const isHttpUrl = (value: string): boolean => value.startsWith('http://') || value.startsWith('https://');
+
+export const toProxyImageUrl = (origin: string, imageUrl: string, link: string): string => {
+    const url = new URL('/api/rebang/image', origin);
+    url.searchParams.set('url', imageUrl);
+    url.searchParams.set('link', link);
+    return url.toString();
+};
+
 export const htmlToText = (html: string | undefined) => {
     if (!html) {
         return '';
@@ -138,7 +169,7 @@ export const summarize = (text: string, maxLen: number) => {
     return text.slice(0, maxLen) + '...';
 };
 
-export const toUiItems = (feed: JsonFeed, source: { key: string; name: string }, limit: number): RebangUiItem[] => {
+export const toUiItems = (feed: JsonFeed, source: { key: string; name: string }, limit: number, origin?: string): RebangUiItem[] => {
     const items = feed.items ?? [];
     return items
         .filter((item) => item.title && (item.url || item.id))
@@ -147,7 +178,12 @@ export const toUiItems = (feed: JsonFeed, source: { key: string; name: string },
             const link = item.url ?? item.id;
             const text = htmlToText(item.summary || item.content_text || item.content_html);
             const summary = text ? summarize(text, 120) : undefined;
-            const image = item.image || extractFirstImageUrl(item.content_html) || extractFirstImageUrl(item.summary);
+            const rawImage = item.image || extractFirstImageUrl(item.content_html) || extractFirstImageUrl(item.summary);
+            const decodedImage = rawImage ? decodeHTML(rawImage) : undefined;
+            const normalizedImage = normalizeMaybeUrl(decodedImage, link);
+            const image = origin && normalizedImage && isHttpUrl(normalizedImage) ? toProxyImageUrl(origin, normalizedImage, link) : normalizedImage;
+            const inferredSourceName = source.key === 'journal-tech' && Array.isArray(item.tags) && item.tags.length ? item.tags[0] : undefined;
+            const resolvedSource = inferredSourceName ? { key: source.key, name: inferredSourceName } : source;
 
             return {
                 rank: idx + 1,
@@ -156,7 +192,7 @@ export const toUiItems = (feed: JsonFeed, source: { key: string; name: string },
                 summary,
                 image,
                 datePublished: item.date_published,
-                source,
+                source: resolvedSource,
             };
         });
 };
@@ -198,7 +234,7 @@ export const aggregateToUiItems = async (origin: string, sources: RebangAggregat
         const r = results[i];
         const source = sources[i];
         if (r.status === 'fulfilled') {
-            merged.push(...toUiItems(r.value.feed, { key: r.value.source.key, name: r.value.source.name }, perSource));
+            merged.push(...toUiItems(r.value.feed, { key: r.value.source.key, name: r.value.source.name }, perSource, origin));
         } else {
             errors.push({ sourceKey: source?.key ?? 'unknown', message: r.reason instanceof Error ? r.reason.message : String(r.reason) });
         }

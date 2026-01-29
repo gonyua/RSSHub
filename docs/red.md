@@ -23,6 +23,8 @@
     https://docs.rsshub.app/zh/joinus/advanced/use-cache
     https://docs.rsshub.app/zh/joinus/advanced/pub-date
 
+    https://docs.rsshub.app/routes/
+
 - 方式 A（推荐本地快速验证）：临时指定系统 Chrome：CHROMIUM_EXECUTABLE_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" 再
   启动 RSSHub（只影响本次进程，不改系统环境变量持久配置）。
 - 方式 B：下载 Puppeteer 需要的 Chrome 到项目缓存：pnpm exec rebrowser-puppeteer browsers install chrome（会写到项目目录的缓存里）。

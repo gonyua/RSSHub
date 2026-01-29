@@ -12,69 +12,70 @@ type Props = {
 const RebangView: FC<Props> = ({ path, title }) => (
     <RebangLayout title={title}>
         <div id="rebang-root" data-path={path} className="min-h-screen flex flex-col">
-            <header className="sticky top-0 z-50 border-b border-[var(--rb-border)] bg-[color:var(--rb-bg)]/90 backdrop-blur">
+            <header className="sticky top-0 z-50 border-b border-[var(--rb-border)] bg-[color:var(--rb-surface)]">
                 <div className="mx-auto max-w-6xl px-4">
-                    <div className="h-14 flex items-center justify-between gap-4">
-                        <a className="hidden sm:flex items-center gap-2 font-extrabold tracking-wide text-xl rb-link" href="/rebang">
-                            Rebang.Today
-                        </a>
-                        <button id="rb-mobile-menu" className="sm:hidden rb-card rounded-full w-10 h-10 grid place-items-center rb-ring" type="button" aria-label="菜单">
-                            <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M4 6h16M4 12h16M4 18h16" />
-                            </svg>
-                        </button>
+                    <div className="h-[59px] flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-8">
+                            <button id="rb-mobile-menu" className="sm:hidden rb-card rounded-full w-10 h-10 grid place-items-center rb-ring" type="button" aria-label="菜单">
+                                <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M4 6h16M4 12h16M4 18h16" />
+                                </svg>
+                            </button>
 
-                        <nav className="hidden sm:flex items-center gap-6 text-sm font-semibold text-[color:var(--rb-text-2)]">
-                            <a className="rb-link" href="/rebang/following">
-                                订阅
+                            <a className="hidden sm:flex items-center gap-2 font-extrabold tracking-wide text-xl rb-link" href="/rebang">
+                                Rebang
                             </a>
-                            <a className="rb-link" data-rb-nav="home" href="/rebang">
-                                综合
-                            </a>
-                            <a className="rb-link" data-rb-nav="tech" href="/rebang/tech">
-                                科技
-                            </a>
-                            <a className="rb-link" data-rb-nav="ent" href="/rebang/ent">
-                                娱乐
-                            </a>
-                            <a className="rb-link" data-rb-nav="community" href="/rebang/community">
-                                社区
-                            </a>
-                            <a className="rb-link" data-rb-nav="fin" href="/rebang/fin">
-                                财经
-                            </a>
-                            <a className="rb-link" data-rb-nav="dev" href="/rebang/dev">
-                                开发
-                            </a>
-                        </nav>
+
+                            <nav className="hidden sm:flex items-center gap-8 text-[16px] font-medium text-[color:var(--rb-text-2)]">
+                                <a className="rb-link h-14 inline-flex items-center border-b-2 border-transparent" data-rb-nav="home" href="/rebang">
+                                    综合
+                                </a>
+                                <a className="rb-link h-14 inline-flex items-center border-b-2 border-transparent" data-rb-nav="tech" href="/rebang/tech">
+                                    科技
+                                </a>
+                                <a className="rb-link h-14 inline-flex items-center border-b-2 border-transparent" data-rb-nav="ent" href="/rebang/ent">
+                                    娱乐
+                                </a>
+                                <a className="rb-link h-14 inline-flex items-center border-b-2 border-transparent" data-rb-nav="community" href="/rebang/community">
+                                    社区
+                                </a>
+                                <a className="rb-link h-14 inline-flex items-center border-b-2 border-transparent" data-rb-nav="fin" href="/rebang/fin">
+                                    财经
+                                </a>
+                                <a className="rb-link h-14 inline-flex items-center border-b-2 border-transparent" data-rb-nav="dev" href="/rebang/dev">
+                                    开发
+                                </a>
+                            </nav>
+                        </div>
 
                         <div className="flex items-center gap-2">
                             <button id="rb-theme-toggle" className="rb-card rounded-full w-10 h-10 grid place-items-center rb-ring" type="button" aria-label="切换主题">
-                                <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 3a7 7 0 0 0 0 14 7.5 7.5 0 0 1 0-14z" />
-                                    <path d="M12 3v2M12 19v2M3 12h2M19 12h2M5 5l1.4 1.4M17.6 17.6L19 19M5 19l1.4-1.4M17.6 6.4L19 5" />
+                                <svg fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" className="w-5 h-5 rb-icon-light" aria-hidden="true" focusable="false">
+                                    <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />
+                                </svg>
+                                <svg fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" className="w-5 h-5 rb-icon-dark" aria-hidden="true" focusable="false">
+                                    <circle cx="12" cy="12" r="4" />
+                                    <path d="M12 2v2" />
+                                    <path d="M12 20v2" />
+                                    <path d="m4.93 4.93 1.41 1.41" />
+                                    <path d="m17.66 17.66 1.41 1.41" />
+                                    <path d="M2 12h2" />
+                                    <path d="M20 12h2" />
+                                    <path d="m6.34 17.66-1.41 1.41" />
+                                    <path d="m19.07 4.93-1.41 1.41" />
                                 </svg>
                             </button>
                             <a className="rb-card rounded-full w-10 h-10 grid place-items-center rb-ring" href="/rebang/setting" aria-label="设置">
-                                <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" />
-                                    <path d="M19.4 15a1.8 1.8 0 0 0 .4 2l.1.1a2.2 2.2 0 0 1-1.6 3.7 2.1 2.1 0 0 1-1.5-.6l-.1-.1a1.8 1.8 0 0 0-2-.4 1.8 1.8 0 0 0-1.1 1.6V21a2.2 2.2 0 0 1-4.4 0v-.1a1.8 1.8 0 0 0-1.1-1.6 1.8 1.8 0 0 0-2 .4l-.1.1a2.1 2.1 0 0 1-1.5.6 2.2 2.2 0 0 1-1.6-3.7l.1-.1a1.8 1.8 0 0 0 .4-2 1.8 1.8 0 0 0-1.6-1.1H3a2.2 2.2 0 0 1 0-4.4h.1a1.8 1.8 0 0 0 1.6-1.1 1.8 1.8 0 0 0-.4-2l-.1-.1A2.2 2.2 0 0 1 6 1.8c.6 0 1.1.2 1.5.6l.1.1a1.8 1.8 0 0 0 2 .4 1.8 1.8 0 0 0 1.1-1.6V1a2.2 2.2 0 0 1 4.4 0v.1a1.8 1.8 0 0 0 1.1 1.6 1.8 1.8 0 0 0 2-.4l.1-.1c.4-.4.9-.6 1.5-.6a2.2 2.2 0 0 1 1.6 3.7l-.1.1a1.8 1.8 0 0 0-.4 2 1.8 1.8 0 0 0 1.6 1.1H21a2.2 2.2 0 0 1 0 4.4h-.1a1.8 1.8 0 0 0-1.6 1.1z" />
+                                <svg fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" className="w-5 h-5" aria-hidden="true" focusable="false">
+                                    <path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" />
+                                    <circle cx="12" cy="12" r="3" />
                                 </svg>
-                            </a>
-                            <a className="hidden sm:inline-flex items-center justify-center h-10 px-4 rounded-full bg-[#2563eb] text-white font-semibold rb-ring" href="/rebang/following">
-                                登录
-                            </a>
-                            <a className="sm:hidden inline-flex items-center justify-center h-10 px-4 rounded-full bg-[#2563eb] text-white font-semibold rb-ring" href="/rebang/following">
-                                登录
                             </a>
                         </div>
                     </div>
                 </div>
                 <div id="rb-mobile-drawer" className="sm:hidden hidden border-t border-[var(--rb-border)]">
                     <div className="mx-auto max-w-6xl px-4 py-3 flex flex-col gap-2 text-sm font-semibold">
-                        <a className="rb-link py-2" href="/rebang/following">
-                            订阅
-                        </a>
                         <a className="rb-link py-2" href="/rebang">
                             综合
                         </a>
@@ -96,9 +97,6 @@ const RebangView: FC<Props> = ({ path, title }) => (
                         <a className="rb-link py-2" href="/rebang/setting">
                             设置
                         </a>
-                        <a className="rb-link py-2" href="/rebang/following">
-                            订阅
-                        </a>
                     </div>
                 </div>
             </header>
@@ -108,22 +106,61 @@ const RebangView: FC<Props> = ({ path, title }) => (
                     <div className="flex flex-col lg:flex-row gap-6">
                         <section className="flex-1 min-w-0">
                             <div id="rb-page-list" className="space-y-4">
-                                <div id="rb-tab-bar" className="rb-card rounded-xl p-3 rb-scroll overflow-x-auto">
-                                    <div className="flex items-center gap-2" id="rb-tabs"></div>
+                                <div id="rb-tab-bar" className="relative flex items-center border-b lg:border border-[var(--rb-border)] mb-2 lg:pt-2 pb-2 lg:rounded-md bg-[color:var(--rb-surface)] px-3 shadow-sm">
+                                    <div id="rb-tabs-container" className="flex-1 overflow-x-auto no-scrollbar">
+                                        <div className="flex items-center gap-1.5 w-full" id="rb-tabs"></div>
+                                    </div>
+                                    <button
+                                        id="rb-tab-expand"
+                                        className="absolute right-3 flex items-center gap-1 pl-3 pr-1 py-2 rounded-lg text-[13px] border border-[var(--rb-border)] bg-[color:var(--rb-surface-2)] text-[color:var(--rb-text-2)] hover:text-[color:var(--rb-text)] rb-ring hidden"
+                                        type="button"
+                                    >
+                                        <span id="rb-tab-expand-text">展开</span>
+                                        <svg id="rb-tab-expand-icon" viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M6 9l6 6 6-6" />
+                                        </svg>
+                                    </button>
                                 </div>
 
-                                <div className="rb-card rounded-xl overflow-hidden">
-                                    <div className="border-b border-[var(--rb-border)] px-4 py-3 flex items-center justify-between gap-3">
-                                        <div className="flex items-center gap-3">
-                                            <div id="rb-subtabs" className="flex items-center gap-3 text-sm font-semibold"></div>
+                                <div className="rb-card rounded-md overflow-hidden">
+                                    <div className="border-b border-[var(--rb-border)] bg-[color:var(--rb-surface)] px-3 py-2 flex items-center gap-3">
+                                        <div id="rb-subtabs" className="flex items-center gap-4 text-sm font-semibold"></div>
+                                        <div id="rb-journal-source-filter" className="hidden relative">
+                                            <button
+                                                id="rb-journal-source-filter-btn"
+                                                type="button"
+                                                className="border border-[var(--rb-border)] bg-[color:var(--rb-surface)] text-sm px-2 h-8 rounded-md rb-ring inline-flex items-center gap-1.5"
+                                            >
+                                                <span id="rb-journal-source-filter-label">全部博主</span>
+                                                <svg viewBox="0 0 24 24" className="w-4 h-4 opacity-70" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M6 9l6 6 6-6" />
+                                                </svg>
+                                            </button>
+                                            <div
+                                                id="rb-journal-source-filter-panel"
+                                                className="hidden absolute left-0 mt-2 w-72 max-w-[80vw] rb-card rounded-lg overflow-hidden shadow-lg border border-[var(--rb-border)] bg-[color:var(--rb-surface)] z-20"
+                                            >
+                                                <div id="rb-journal-source-filter-list" className="max-h-[60vh] overflow-auto p-2 space-y-1"></div>
+                                                <div className="border-t border-[var(--rb-border)] bg-[color:var(--rb-surface)] px-2 py-2 flex items-center justify-between">
+                                                    <button id="rb-journal-source-filter-toggle-all" type="button" className="text-sm text-[color:var(--rb-text-2)] hover:text-[color:var(--rb-text)] rb-ring px-2 py-1 rounded-md">
+                                                        取消全选
+                                                    </button>
+                                                    <button
+                                                        id="rb-journal-source-filter-save"
+                                                        type="button"
+                                                        className="text-sm text-[#165DFF] font-semibold rb-ring px-2 py-1 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        disabled
+                                                    >
+                                                        保存
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <select id="rb-node-select" className="rb-card text-sm px-3 py-2 rounded-lg rb-ring">
-                                                <option value="">全部节点</option>
-                                            </select>
-                                            <span className="text-[color:var(--rb-muted)] text-sm" id="rb-status"></span>
-                                        </div>
+                                        <select id="rb-node-select" className="ml-auto border border-[var(--rb-border)] bg-[color:var(--rb-surface)] text-sm px-2 h-8 w-28 rounded-md rb-ring">
+                                            <option value="">全部节点</option>
+                                        </select>
                                     </div>
+                                    <div id="rb-status" className="hidden px-3 py-2 text-sm text-[#ef4444] bg-[color:var(--rb-surface)]"></div>
 
                                     <ul id="rb-items" className="divide-y divide-[var(--rb-border)]"></ul>
                                 </div>
@@ -133,13 +170,7 @@ const RebangView: FC<Props> = ({ path, title }) => (
                                 <div className="rb-card rounded-xl p-4">
                                     <div className="flex items-start gap-3 bg-amber-50 text-amber-900 dark:bg-[#2a1e07] dark:text-amber-200 border border-amber-200 dark:border-[#5a3f10] rounded-lg p-3">
                                         <div className="mt-0.5">⚠️</div>
-                                        <div className="text-sm">
-                                            未登录，修改将保存在本地，
-                                            <a className="underline" href="/rebang/following">
-                                                登录
-                                            </a>{' '}
-                                            后可保存至云端（MVP 暂不支持）
-                                        </div>
+                                        <div className="text-sm">未登录，修改将保存在本地。</div>
                                     </div>
 
                                     <div className="mt-4 space-y-6">
@@ -172,7 +203,7 @@ const RebangView: FC<Props> = ({ path, title }) => (
                                             <div className="font-bold mb-2">自定义屏蔽词</div>
                                             <div className="flex items-center gap-2">
                                                 <input id="rb-setting-blockword" className="rb-card text-sm px-3 py-2 rounded-lg rb-ring w-full" placeholder="请输入屏蔽词" />
-                                                <button id="rb-setting-blockword-add" className="h-10 px-4 rounded-lg bg-[#2563eb] text-white font-semibold rb-ring" type="button">
+                                                <button id="rb-setting-blockword-add" className="h-10 px-4 rounded-lg bg-[#165DFF] text-white font-semibold rb-ring" type="button">
                                                     添加
                                                 </button>
                                             </div>
@@ -184,10 +215,8 @@ const RebangView: FC<Props> = ({ path, title }) => (
 
                             <div id="rb-page-following" className="hidden">
                                 <div className="rb-card rounded-xl p-6">
-                                    <div className="text-lg font-bold mb-2">订阅你喜欢的内容，请登录后使用</div>
-                                    <a href="/rebang" className="inline-flex mt-4 items-center justify-center h-10 px-4 rounded-full bg-[#2563eb] text-white font-semibold rb-ring">
-                                        去登录
-                                    </a>
+                                    <div className="text-lg font-bold mb-2">订阅功能暂未开放</div>
+                                    <div className="text-sm text-[color:var(--rb-text-2)]">当前版本暂不提供订阅能力。</div>
                                 </div>
                             </div>
                         </section>
@@ -207,8 +236,6 @@ const RebangView: FC<Props> = ({ path, title }) => (
                                     <ol id="rb-rising" className="space-y-3"></ol>
                                 </div>
                             </div>
-
-                            <div className="rb-card rounded-xl p-4 text-sm text-[color:var(--rb-text-2)]">数据来自本项目（RSSHub）路由输出；MVP 仅接入少量节点，后续可扩展。</div>
                         </aside>
                     </div>
                 </div>
@@ -223,10 +250,6 @@ const RebangView: FC<Props> = ({ path, title }) => (
                         <span>·</span>
                         <a className="rb-link" href="/rebang/setting">
                             设置
-                        </a>
-                        <span>·</span>
-                        <a className="rb-link" href="/rebang/following">
-                            订阅
                         </a>
                     </div>
                     <div>©{new Date().getFullYear()} Rebang Clone</div>
