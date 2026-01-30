@@ -45,6 +45,9 @@ const RebangView: FC<Props> = ({ path, title }) => (
                                 <a className="rb-link h-14 inline-flex items-center border-b-2 border-transparent" data-rb-nav="dev" href="/rebang/dev">
                                     开发
                                 </a>
+                                <a className="rb-link h-14 inline-flex items-center border-b-2 border-transparent" data-rb-nav="following" href="/rebang/following">
+                                    关注
+                                </a>
                             </nav>
                         </div>
 
@@ -94,6 +97,9 @@ const RebangView: FC<Props> = ({ path, title }) => (
                         <a className="rb-link py-2" href="/rebang/dev">
                             开发
                         </a>
+                        <a className="rb-link py-2" href="/rebang/following">
+                            关注
+                        </a>
                         <a className="rb-link py-2" href="/rebang/setting">
                             设置
                         </a>
@@ -109,6 +115,14 @@ const RebangView: FC<Props> = ({ path, title }) => (
                                 <div id="rb-tab-bar" className="relative flex items-center border-b lg:border border-[var(--rb-border)] mb-2 lg:pt-2 pb-2 lg:rounded-md bg-[color:var(--rb-surface)] px-3 shadow-sm">
                                     <div id="rb-tabs-container" className="flex-1 overflow-x-auto no-scrollbar">
                                         <div className="flex items-center gap-1.5 w-full" id="rb-tabs"></div>
+                                    </div>
+                                    <div id="rb-following-actions" className="hidden shrink-0 flex items-center gap-2 ml-2">
+                                        <button id="rb-following-add" className="h-8 px-3 rounded-lg bg-[#165DFF] text-white text-sm font-semibold rb-ring" type="button">
+                                            新增
+                                        </button>
+                                        <button id="rb-following-manage" className="h-8 px-3 rounded-lg border border-[var(--rb-border)] bg-[color:var(--rb-surface-2)] text-sm font-semibold rb-ring" type="button">
+                                            管理
+                                        </button>
                                     </div>
                                     <button
                                         id="rb-tab-expand"
@@ -255,6 +269,47 @@ const RebangView: FC<Props> = ({ path, title }) => (
                     <div>©{new Date().getFullYear()} Rebang Clone</div>
                 </div>
             </footer>
+        </div>
+
+        <div id="rb-following-modal" className="hidden fixed inset-0 z-[100]">
+            <div id="rb-following-modal-mask" className="absolute inset-0 bg-black/40"></div>
+            <div className="absolute inset-0 flex items-center justify-center p-4">
+                <div className="rb-card w-full max-w-3xl rounded-xl overflow-hidden">
+                    <div className="px-4 py-3 border-b border-[var(--rb-border)] flex items-center gap-2">
+                        <div id="rb-following-modal-title" className="font-bold">
+                            新增关注
+                        </div>
+                        <div id="rb-following-modal-hint" className="text-xs text-[color:var(--rb-muted)]"></div>
+                        <button id="rb-following-cancel" className="ml-auto h-8 px-3 rounded-lg border border-[var(--rb-border)] bg-[color:var(--rb-surface-2)] text-sm font-semibold rb-ring" type="button">
+                            关闭
+                        </button>
+                    </div>
+
+                    <div id="rb-following-modal-status" className="hidden px-4 py-2 text-sm text-[#ef4444] bg-[color:var(--rb-surface)]"></div>
+
+                    <div id="rb-following-step-pick" className="p-4 space-y-3">
+                        <input id="rb-following-route-search" className="rb-card text-sm px-3 py-2 rounded-lg rb-ring w-full" placeholder="搜索路由（站点/路由名/路径）" />
+                        <div id="rb-following-route-list" className="max-h-[55vh] overflow-auto rb-scroll divide-y divide-[var(--rb-border)]"></div>
+                    </div>
+
+                    <div id="rb-following-step-param" className="hidden p-4 space-y-4">
+                        <div id="rb-following-picked" className="text-sm text-[color:var(--rb-text-2)]"></div>
+                        <div id="rb-following-param-form" className="space-y-3"></div>
+                        <div className="flex items-center justify-end gap-2">
+                            <button id="rb-following-back" className="h-9 px-4 rounded-lg border border-[var(--rb-border)] bg-[color:var(--rb-surface-2)] text-sm font-semibold rb-ring" type="button">
+                                返回
+                            </button>
+                            <button id="rb-following-confirm" className="h-9 px-4 rounded-lg bg-[#165DFF] text-white text-sm font-semibold rb-ring" type="button">
+                                保存
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="rb-following-step-manage" className="hidden p-4 space-y-3">
+                        <div id="rb-following-manage-list" className="max-h-[60vh] overflow-auto rb-scroll divide-y divide-[var(--rb-border)]"></div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <script id="rb-menu" type="application/json">

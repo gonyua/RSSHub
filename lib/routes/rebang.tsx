@@ -11,7 +11,7 @@ const titleByPath = (pathname: string) => {
         '/rebang/fin': '今日热榜 - 财经',
         '/rebang/dev': '今日热榜 - 开发',
         '/rebang/setting': '今日热榜 - 设置',
-        '/rebang/following': '今日热榜 - 订阅',
+        '/rebang/following': '今日热榜 - 关注',
     };
     return map[pathname] ?? '今日热榜';
 };

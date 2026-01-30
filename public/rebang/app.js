@@ -5,6 +5,7 @@ const STORAGE = {
     tabBarDefault: 'rebang:tabBarDefault',
     defaultMenu: 'rebang:defaultMenu',
     blockWords: 'rebang:blockWords',
+    following: 'rebang:following',
 };
 
 const DEFAULTS = {
@@ -14,6 +15,7 @@ const DEFAULTS = {
     [STORAGE.tabBarDefault]: 'collapsed',
     [STORAGE.defaultMenu]: 'home',
     [STORAGE.blockWords]: [],
+    [STORAGE.following]: [],
 };
 
 const getSetting = (key) => {
@@ -22,7 +24,7 @@ const getSetting = (key) => {
         if (raw === null) {
             return DEFAULTS[key];
         }
-        if (key === STORAGE.blockWords) {
+        if (key === STORAGE.blockWords || key === STORAGE.following) {
             const parsed = JSON.parse(raw);
             return Array.isArray(parsed) ? parsed : [];
         }
@@ -33,7 +35,7 @@ const getSetting = (key) => {
 };
 
 const setSetting = (key, value) => {
-    if (key === STORAGE.blockWords) {
+    if (key === STORAGE.blockWords || key === STORAGE.following) {
         localStorage.setItem(key, JSON.stringify(value));
     } else {
         localStorage.setItem(key, String(value));
@@ -50,6 +52,9 @@ const applyTheme = () => {
 const getCategoryKeyByPath = (pathname) => {
     if (pathname === '/rebang' || pathname === '/rebang/') {
         return 'home';
+    }
+    if (pathname.startsWith('/rebang/following')) {
+        return 'following';
     }
     if (pathname.startsWith('/rebang/tech')) {
         return 'tech';
@@ -72,9 +77,6 @@ const getCategoryKeyByPath = (pathname) => {
 const getPageByPath = (pathname) => {
     if (pathname.startsWith('/rebang/setting')) {
         return 'setting';
-    }
-    if (pathname.startsWith('/rebang/following')) {
-        return 'following';
     }
     return 'list';
 };
@@ -125,7 +127,8 @@ const loadMenu = () => {
     if (!el) {
         return null;
     }
-    return JSON.parse(el.textContent || 'null');
+    const parsed = JSON.parse(el.textContent || 'null');
+    return injectFollowingCategory(parsed);
 };
 
 const updateActiveNav = (categoryKey) => {
@@ -176,6 +179,65 @@ const TAB_ICONS = {
     github: '/rebang/icons/github.png',
 };
 
+const FOLLOWING_CATEGORY_KEY = 'following';
+
+const hashString32 = (s) => {
+    let h = 2_166_136_261;
+    for (const ch of s) {
+        h ^= ch.codePointAt(0) ?? 0;
+        h = Math.imul(h, 16_777_619);
+    }
+    return (h >>> 0).toString(36);
+};
+
+const getFollowingItems = () => {
+    const raw = getSetting(STORAGE.following);
+    if (!Array.isArray(raw)) {
+        return [];
+    }
+    return raw
+        .filter((it) => it && typeof it === 'object')
+        .map((it) => ({
+            id: typeof it.id === 'string' ? it.id : '',
+            title: typeof it.title === 'string' ? it.title : '',
+            rsshubPath: typeof it.rsshubPath === 'string' ? it.rsshubPath : '',
+            fullPathPattern: typeof it.fullPathPattern === 'string' ? it.fullPathPattern : '',
+            iconText: typeof it.iconText === 'string' ? it.iconText : '',
+            createdAt: typeof it.createdAt === 'number' ? it.createdAt : 0,
+        }))
+        .filter((it) => it.id && it.title && it.rsshubPath && it.rsshubPath.startsWith('/'));
+};
+
+const setFollowingItems = (items) => {
+    const next = Array.isArray(items) ? items : [];
+    setSetting(STORAGE.following, next);
+};
+
+const buildFollowingCategory = (items) => ({
+    key: FOLLOWING_CATEGORY_KEY,
+    name: '关注',
+    path: '/rebang/following',
+    tabs: items.map((it) => ({
+        key: it.id,
+        name: it.title,
+        type: 'feed',
+        rsshubPath: it.rsshubPath,
+        iconText: it.iconText || it.title.slice(0, 1),
+    })),
+    defaultTabKey: items[0]?.id || '',
+});
+
+const injectFollowingCategory = (menu) => {
+    if (!menu || !Array.isArray(menu.categories)) {
+        return menu;
+    }
+    const items = getFollowingItems();
+    const following = buildFollowingCategory(items);
+    const categories = menu.categories.filter((c) => c?.key !== FOLLOWING_CATEGORY_KEY);
+    categories.push(following);
+    return { ...menu, categories };
+};
+
 const normalizeState = ({ menu, categoryKey, tabKey, subKey }) => {
     const category = menu.categories.find((c) => c.key === categoryKey) || menu.categories.find((c) => c.key === 'home');
     if (!category) {
@@ -197,6 +259,7 @@ const renderTabs = ({ menu, categoryKey, tabKey, subKey }) => {
     const expandText = qs('#rb-tab-expand-text');
     const expandIcon = qs('#rb-tab-expand-icon');
     const nodeSelect = qs('#rb-node-select');
+    const followingActions = qs('#rb-following-actions');
     if (!tabsEl || !nodeSelect || !expandBtn || !expandText || !expandIcon) {
         return;
     }
@@ -205,6 +268,9 @@ const renderTabs = ({ menu, categoryKey, tabKey, subKey }) => {
     if (!state) {
         return;
     }
+
+    const isFollowing = categoryKey === FOLLOWING_CATEGORY_KEY;
+    followingActions?.classList.toggle('hidden', !isFollowing);
 
     const expandedDefault = getSetting(STORAGE.tabBarDefault) === 'expanded';
     const isExpanded = localStorage.getItem('rebang:tabExpanded') ? localStorage.getItem('rebang:tabExpanded') === 'true' : expandedDefault;
@@ -241,7 +307,7 @@ const renderTabs = ({ menu, categoryKey, tabKey, subKey }) => {
 
     const tabButtons = [...tabsEl.querySelectorAll('[data-rb-tab]')];
     const topSet = new Set(tabButtons.map((el) => Math.round(el.offsetTop)));
-    const showExpand = tabButtons.length > 0 && topSet.size > 1;
+    const showExpand = !isFollowing && tabButtons.length > 0 && topSet.size > 1;
     const firstTop = tabButtons[0] ? Math.round(tabButtons[0].offsetTop) : 0;
     let firstRowBottom = 0;
     for (const el of tabButtons) {
@@ -502,8 +568,24 @@ const renderItems = (items) => {
         .join('');
 };
 
-const fetchItems = async ({ categoryKey, tabKey, subKey }) => {
+const fetchItems = async ({ menu, categoryKey, tabKey, subKey }) => {
     setStatus('加载中...');
+
+    if (categoryKey === FOLLOWING_CATEGORY_KEY) {
+        const state = normalizeState({ menu, categoryKey, tabKey, subKey });
+        const rsshubPath = state?.tab?.rsshubPath;
+        if (!rsshubPath) {
+            throw new Error('暂无关注，点击右侧“新增”添加');
+        }
+        const url = new URL('/api/rebang/feed', window.location.origin);
+        url.searchParams.set('path', rsshubPath);
+        const res = await fetch(url, { headers: { accept: 'application/json' } });
+        const data = await res.json();
+        if (!res.ok) {
+            throw new Error(data?.message || '加载失败');
+        }
+        return data;
+    }
 
     const url = new URL('/api/rebang/items', window.location.origin);
     url.searchParams.set('category', categoryKey);
@@ -717,7 +799,7 @@ const refreshList = async ({ menu, categoryKey, tabKey, subKey }) => {
     if (!state?.tab) {
         renderJournalTechSourceFilter({ tabKey: null, items: [], sources: null });
         renderItems([]);
-        setStatus('暂无节点');
+        setStatus(state?.category?.key === FOLLOWING_CATEGORY_KEY ? '暂无关注，点击右侧“新增”添加' : '暂无节点');
         return;
     }
 
@@ -740,7 +822,7 @@ const refreshList = async ({ menu, categoryKey, tabKey, subKey }) => {
     }
 
     try {
-        const data = await fetchItems({ categoryKey: state.category.key, tabKey: state.tab.key, subKey: state.subKey });
+        const data = await fetchItems({ menu, categoryKey: state.category.key, tabKey: state.tab.key, subKey: state.subKey });
         lastListData = data;
         renderJournalTechSourceFilter({ tabKey: state.tab.key, items: data.items, sources: data.sources });
         renderItems(data.items);
@@ -920,10 +1002,529 @@ const bindSearch = () => {
     });
 };
 
+let followingRoutesCache = null;
+let followingPickedRoute = null;
+
+const getFollowingModalEls = () => ({
+    modal: qs('#rb-following-modal'),
+    mask: qs('#rb-following-modal-mask'),
+    title: qs('#rb-following-modal-title'),
+    hint: qs('#rb-following-modal-hint'),
+    status: qs('#rb-following-modal-status'),
+    stepPick: qs('#rb-following-step-pick'),
+    stepParam: qs('#rb-following-step-param'),
+    stepManage: qs('#rb-following-step-manage'),
+    search: qs('#rb-following-route-search'),
+    routeList: qs('#rb-following-route-list'),
+    picked: qs('#rb-following-picked'),
+    paramForm: qs('#rb-following-param-form'),
+    cancel: qs('#rb-following-cancel'),
+    back: qs('#rb-following-back'),
+    confirm: qs('#rb-following-confirm'),
+    manageList: qs('#rb-following-manage-list'),
+});
+
+const setFollowingModalStatus = (text) => {
+    const { status } = getFollowingModalEls();
+    if (!status) {
+        return;
+    }
+    const v = text ? String(text) : '';
+    status.textContent = v;
+    status.classList.toggle('hidden', !v);
+};
+
+const closeFollowingModal = () => {
+    const { modal, stepPick, stepParam, stepManage } = getFollowingModalEls();
+    if (!modal || !stepPick || !stepParam || !stepManage) {
+        return;
+    }
+    setFollowingModalStatus('');
+    followingPickedRoute = null;
+    modal.classList.add('hidden');
+    stepPick.classList.remove('hidden');
+    stepParam.classList.add('hidden');
+    stepManage.classList.add('hidden');
+};
+
+const fetchFollowingRoutesOnce = async () => {
+    if (followingRoutesCache) {
+        return followingRoutesCache;
+    }
+    const url = new URL('/api/rebang/routes', window.location.origin);
+    const res = await fetch(url, { headers: { accept: 'application/json' } });
+    const data = await res.json();
+    if (!res.ok) {
+        throw new Error(data?.message || '加载路由列表失败');
+    }
+    followingRoutesCache = Array.isArray(data?.routes) ? data.routes : [];
+    return followingRoutesCache;
+};
+
+const filterRoutes = (routes, q) => {
+    const needle = String(q || '')
+        .trim()
+        .toLowerCase();
+    if (!needle) {
+        return routes;
+    }
+    return routes.filter((r) => {
+        const fullPath = String(r.fullPath || '').toLowerCase();
+        const name = String(r.name || '').toLowerCase();
+        const namespaceName = String(r.namespaceName || '').toLowerCase();
+        return fullPath.includes(needle) || name.includes(needle) || namespaceName.includes(needle);
+    });
+};
+
+const renderFollowingRouteList = ({ routes, q }) => {
+    const { routeList, hint } = getFollowingModalEls();
+    if (!routeList || !hint) {
+        return;
+    }
+
+    const filtered = filterRoutes(routes, q);
+    const limit = 200;
+    const visible = filtered.slice(0, limit);
+    hint.textContent = `共 ${filtered.length} 条${filtered.length > limit ? `，显示前 ${limit} 条` : ''}`;
+
+    routeList.innerHTML = visible
+        .map((r, idx) => {
+            const namespaceName = String(r.namespaceName || r.namespace || '');
+            const name = String(r.name || '');
+            const fullPath = String(r.fullPath || '');
+            const example = String(r.example || '');
+            const meta = example && example.startsWith('/') ? `<div class="mt-1 text-xs text-[color:var(--rb-muted)]">示例：${escapeHtml(example)}</div>` : '';
+            return `
+        <button type="button" data-rb-following-route-idx="${idx}" class="w-full text-left px-3 py-3 hover:bg-[color:var(--rb-surface-2)] rb-ring">
+          <div class="flex items-center gap-2">
+            <span class="text-xs px-2 py-0.5 rounded-md rb-chip">${escapeHtml(namespaceName)}</span>
+            <span class="font-semibold">${escapeHtml(name || fullPath)}</span>
+          </div>
+          <div class="mt-1 text-sm text-[color:var(--rb-text-2)]">${escapeHtml(fullPath)}</div>
+          ${meta}
+        </button>
+      `;
+        })
+        .join('');
+
+    routeList.dataset.rbFollowingVisibleCount = String(visible.length);
+};
+
+const parsePathParams = (pattern) => {
+    const segs = String(pattern || '')
+        .split('?')[0]
+        .split('/')
+        .filter(Boolean);
+    const params = [];
+    for (const seg of segs) {
+        if (!seg.startsWith(':')) {
+            continue;
+        }
+        const optional = seg.endsWith('?');
+        const base = optional ? seg.slice(0, -1) : seg;
+        const nameRaw = base.slice(1);
+        const name = nameRaw.split('{')[0].split('(')[0];
+        if (!name) {
+            continue;
+        }
+        params.push({ name, optional });
+    }
+    return params;
+};
+
+const deriveParamDefaultsFromExample = (pattern, example) => {
+    const patternSegs = String(pattern || '')
+        .split('?')[0]
+        .split('/')
+        .filter(Boolean);
+    const exampleSegs = String(example || '')
+        .split('?')[0]
+        .split('/')
+        .filter(Boolean);
+
+    const defaults = {};
+    for (let i = 0; i < patternSegs.length; i++) {
+        const seg = patternSegs[i];
+        if (!seg.startsWith(':')) {
+            continue;
+        }
+        const optional = seg.endsWith('?');
+        const base = optional ? seg.slice(0, -1) : seg;
+        const name = base.slice(1).split('{')[0].split('(')[0];
+        const v = exampleSegs[i];
+        if (name && v) {
+            defaults[name] = v;
+        }
+    }
+    return defaults;
+};
+
+const renderFollowingParamForm = (route) => {
+    const { picked, paramForm, stepPick, stepParam, title, hint } = getFollowingModalEls();
+    if (!picked || !paramForm || !stepPick || !stepParam || !title || !hint) {
+        return;
+    }
+
+    const fullPath = String(route.fullPath || '');
+    const namespaceName = String(route.namespaceName || route.namespace || '');
+    const routeName = String(route.name || fullPath);
+    const example = String(route.example || '');
+
+    title.textContent = '新增关注';
+    hint.textContent = '';
+    picked.textContent = `${namespaceName} · ${routeName} · ${fullPath}`;
+
+    const params = parsePathParams(fullPath);
+    const exampleDefaults = deriveParamDefaultsFromExample(fullPath, example);
+
+    if (params.length) {
+        paramForm.innerHTML = params
+            .map(({ name, optional }) => {
+                const paramMeta = route.parameters?.[name];
+                const metaObj = typeof paramMeta === 'string' ? { description: paramMeta } : paramMeta;
+                const desc = metaObj?.description ? String(metaObj.description) : '';
+                const defaultValue = metaObj?.default ?? exampleDefaults[name] ?? '';
+                const options = Array.isArray(metaObj?.options) ? metaObj.options : null;
+
+                if (options?.length) {
+                    const opts = ['<option value="">请选择</option>', ...options.map((o) => `<option value="${escapeHtml(o.value)}">${escapeHtml(o.label)}</option>`)].join('');
+                    return `
+          <div>
+            <label class="block text-sm font-semibold mb-1">${escapeHtml(name)}${optional ? '（可选）' : ''}</label>
+            <select id="rb-following-param-${escapeHtml(name)}" data-rb-following-param="${escapeHtml(name)}" class="rb-card text-sm px-3 py-2 rounded-lg rb-ring w-full">
+              ${opts}
+            </select>
+            ${desc ? `<div class="mt-1 text-xs text-[color:var(--rb-muted)]">${escapeHtml(desc)}</div>` : ''}
+          </div>
+        `;
+                }
+
+                return `
+        <div>
+          <label class="block text-sm font-semibold mb-1">${escapeHtml(name)}${optional ? '（可选）' : ''}</label>
+          <input id="rb-following-param-${escapeHtml(name)}" data-rb-following-param="${escapeHtml(name)}" class="rb-card text-sm px-3 py-2 rounded-lg rb-ring w-full" placeholder="${escapeHtml(optional ? '可留空' : '必填')}" value="${escapeHtml(String(defaultValue))}" />
+          ${desc ? `<div class="mt-1 text-xs text-[color:var(--rb-muted)]">${escapeHtml(desc)}</div>` : ''}
+        </div>
+      `;
+            })
+            .join('');
+
+        for (const el of paramForm.querySelectorAll('[data-rb-following-param]')) {
+            if (el instanceof HTMLSelectElement) {
+                const name = el.dataset.rbFollowingParam;
+                const paramMeta = name ? route.parameters?.[name] : undefined;
+                const metaObj = typeof paramMeta === 'string' ? { description: paramMeta } : paramMeta;
+                const defaultValue = metaObj?.default ?? exampleDefaults[name] ?? '';
+                if (defaultValue) {
+                    el.value = String(defaultValue);
+                }
+            }
+        }
+    } else {
+        paramForm.innerHTML = '<div class="text-sm text-[color:var(--rb-text-2)]">该路由无需填写参数，直接保存即可。</div>';
+    }
+
+    stepPick.classList.add('hidden');
+    stepParam.classList.remove('hidden');
+    setFollowingModalStatus('');
+};
+
+const buildRsshubPathFromPattern = (pattern, values) => {
+    const segs = String(pattern || '')
+        .split('?')[0]
+        .split('/')
+        .filter(Boolean);
+    const out = [];
+    for (const seg of segs) {
+        if (!seg.startsWith(':')) {
+            out.push(seg);
+            continue;
+        }
+        const optional = seg.endsWith('?');
+        const base = optional ? seg.slice(0, -1) : seg;
+        const name = base.slice(1).split('{')[0].split('(')[0];
+        const raw = values[name];
+        const v = raw ? String(raw).trim() : '';
+        if (!v) {
+            if (optional) {
+                continue;
+            }
+            throw new Error(`请填写 ${name}`);
+        }
+        out.push(encodeURIComponent(v));
+    }
+    return '/' + out.join('/');
+};
+
+const navigateToFollowingTab = (tabId, { replace }) => {
+    const url = new URL(window.location.href);
+    url.pathname = '/rebang/following';
+    if (tabId) {
+        url.searchParams.set('tab', tabId);
+    } else {
+        url.searchParams.delete('tab');
+    }
+    url.searchParams.delete('sub');
+    if (replace) {
+        window.history.replaceState({}, '', url);
+    } else {
+        window.history.pushState({}, '', url);
+    }
+    refresh();
+};
+
+const openFollowingModal = async (mode) => {
+    const { modal, stepPick, stepParam, stepManage, title, hint, search, manageList } = getFollowingModalEls();
+    if (!modal || !stepPick || !stepParam || !stepManage || !title || !hint) {
+        return;
+    }
+
+    modal.classList.remove('hidden');
+    setFollowingModalStatus('');
+    followingPickedRoute = null;
+
+    if (mode === 'manage') {
+        title.textContent = '管理关注';
+        hint.textContent = '';
+        stepPick.classList.add('hidden');
+        stepParam.classList.add('hidden');
+        stepManage.classList.remove('hidden');
+        renderFollowingManageList();
+        manageList?.scrollTo?.({ top: 0 });
+        return;
+    }
+
+    title.textContent = '新增关注';
+    hint.textContent = '加载中...';
+    stepPick.classList.remove('hidden');
+    stepParam.classList.add('hidden');
+    stepManage.classList.add('hidden');
+
+    try {
+        const routes = await fetchFollowingRoutesOnce();
+        const q = search ? search.value : '';
+        renderFollowingRouteList({ routes, q });
+        if (search) {
+            search.focus();
+        }
+    } catch (error) {
+        setFollowingModalStatus(error instanceof Error ? error.message : '加载失败');
+        hint.textContent = '';
+    }
+};
+
+const renderFollowingManageList = () => {
+    const { manageList, hint } = getFollowingModalEls();
+    if (!manageList || !hint) {
+        return;
+    }
+    const items = getFollowingItems();
+    hint.textContent = `共 ${items.length} 条`;
+    manageList.innerHTML = items.length
+        ? items
+              .map(
+                  (it) => `
+        <div class="px-3 py-3 flex items-start gap-3">
+          <div class="min-w-0 flex-1">
+            <div class="font-semibold">${escapeHtml(it.title)}</div>
+            <div class="mt-1 text-sm text-[color:var(--rb-text-2)] break-all">${escapeHtml(it.rsshubPath)}</div>
+            ${it.fullPathPattern ? `<div class="mt-1 text-xs text-[color:var(--rb-muted)] break-all">${escapeHtml(it.fullPathPattern)}</div>` : ''}
+          </div>
+          <button type="button" data-rb-following-del="${escapeHtml(it.id)}" class="shrink-0 h-8 px-3 rounded-lg border border-[var(--rb-border)] bg-[color:var(--rb-surface-2)] text-sm font-semibold rb-ring">
+            删除
+          </button>
+        </div>
+      `
+              )
+              .join('')
+        : '<div class="px-3 py-6 text-sm text-[color:var(--rb-muted)]">暂无关注项。</div>';
+};
+
+const deleteFollowingItem = (id) => {
+    const items = getFollowingItems();
+    const next = items.filter((it) => it.id !== id);
+    setFollowingItems(next);
+
+    const state = getStateFromLocation();
+    if (state.categoryKey === FOLLOWING_CATEGORY_KEY && state.tabKey === id) {
+        navigateToFollowingTab(next[0]?.id || null, { replace: true });
+    } else {
+        refresh();
+    }
+};
+
+const bindFollowingUi = () => {
+    const { mask, cancel, back, confirm, routeList, search, manageList } = getFollowingModalEls();
+
+    if (mask && mask.dataset.rbBound !== '1') {
+        mask.dataset.rbBound = '1';
+        mask.addEventListener('click', closeFollowingModal);
+    }
+
+    if (cancel && cancel.dataset.rbBound !== '1') {
+        cancel.dataset.rbBound = '1';
+        cancel.addEventListener('click', closeFollowingModal);
+    }
+
+    if (back && back.dataset.rbBound !== '1') {
+        back.dataset.rbBound = '1';
+        back.addEventListener('click', async () => {
+            const { stepPick, stepParam, hint } = getFollowingModalEls();
+            if (!stepPick || !stepParam || !hint) {
+                return;
+            }
+            stepParam.classList.add('hidden');
+            stepPick.classList.remove('hidden');
+            setFollowingModalStatus('');
+            hint.textContent = '';
+            try {
+                const routes = await fetchFollowingRoutesOnce();
+                const q = search ? search.value : '';
+                renderFollowingRouteList({ routes, q });
+            } catch (error) {
+                setFollowingModalStatus(error instanceof Error ? error.message : '加载失败');
+            }
+        });
+    }
+
+    if (confirm && confirm.dataset.rbBound !== '1') {
+        confirm.dataset.rbBound = '1';
+        confirm.addEventListener('click', () => {
+            if (!followingPickedRoute) {
+                return;
+            }
+
+            try {
+                const values = {};
+                const { paramForm } = getFollowingModalEls();
+                if (paramForm) {
+                    for (const el of paramForm.querySelectorAll('[data-rb-following-param]')) {
+                        if (!(el instanceof HTMLInputElement) && !(el instanceof HTMLSelectElement)) {
+                            continue;
+                        }
+                        const name = el.dataset.rbFollowingParam;
+                        if (!name) {
+                            continue;
+                        }
+                        values[name] = el.value;
+                    }
+                }
+
+                const rsshubPath = buildRsshubPathFromPattern(followingPickedRoute.fullPath, values);
+                const existing = getFollowingItems();
+                if (existing.some((it) => it.rsshubPath === rsshubPath)) {
+                    throw new Error('已存在该关注');
+                }
+
+                const id = `follow_${hashString32(rsshubPath)}`;
+                const namespaceName = String(followingPickedRoute.namespaceName || followingPickedRoute.namespace || '');
+                const routeName = String(followingPickedRoute.name || followingPickedRoute.fullPath || '');
+                const title = `${namespaceName} - ${routeName}`;
+
+                const item = {
+                    id,
+                    title,
+                    rsshubPath,
+                    fullPathPattern: String(followingPickedRoute.fullPath || ''),
+                    iconText: namespaceName ? namespaceName.slice(0, 1) : '订',
+                    createdAt: Date.now(),
+                };
+
+                setFollowingItems([item, ...existing]);
+                closeFollowingModal();
+                navigateToFollowingTab(id, { replace: false });
+            } catch (error) {
+                setFollowingModalStatus(error instanceof Error ? error.message : '保存失败');
+            }
+        });
+    }
+
+    if (routeList && routeList.dataset.rbBound !== '1') {
+        routeList.dataset.rbBound = '1';
+        routeList.addEventListener('click', async (e) => {
+            const t = e.target instanceof Element ? e.target.closest('[data-rb-following-route-idx]') : null;
+            if (!t) {
+                return;
+            }
+            const idx = Number.parseInt(t.dataset.rbFollowingRouteIdx || '', 10);
+            if (!Number.isFinite(idx)) {
+                return;
+            }
+            try {
+                const routes = await fetchFollowingRoutesOnce();
+                const q = search ? search.value : '';
+                const visible = filterRoutes(routes, q).slice(0, 200);
+                const picked = visible[idx];
+                if (!picked) {
+                    return;
+                }
+                followingPickedRoute = picked;
+                renderFollowingParamForm(picked);
+            } catch (error) {
+                setFollowingModalStatus(error instanceof Error ? error.message : '加载失败');
+            }
+        });
+    }
+
+    if (search && search.dataset.rbBound !== '1') {
+        search.dataset.rbBound = '1';
+        search.addEventListener('input', async () => {
+            setFollowingModalStatus('');
+            try {
+                const routes = await fetchFollowingRoutesOnce();
+                renderFollowingRouteList({ routes, q: search.value });
+            } catch (error) {
+                setFollowingModalStatus(error instanceof Error ? error.message : '加载失败');
+            }
+        });
+    }
+
+    if (manageList && manageList.dataset.rbBound !== '1') {
+        manageList.dataset.rbBound = '1';
+        manageList.addEventListener('click', (e) => {
+            const t = e.target instanceof Element ? e.target.closest('[data-rb-following-del]') : null;
+            if (!t) {
+                return;
+            }
+            const id = t.dataset.rbFollowingDel;
+            if (!id) {
+                return;
+            }
+            deleteFollowingItem(id);
+            renderFollowingManageList();
+        });
+    }
+
+    if (document.body.dataset.rbFollowingBound !== '1') {
+        document.body.dataset.rbFollowingBound = '1';
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Escape') {
+                return;
+            }
+            const { modal } = getFollowingModalEls();
+            if (!modal || modal.classList.contains('hidden')) {
+                return;
+            }
+            closeFollowingModal();
+        });
+    }
+
+    const addBtn = qs('#rb-following-add');
+    if (addBtn && addBtn.dataset.rbBound !== '1') {
+        addBtn.dataset.rbBound = '1';
+        addBtn.addEventListener('click', () => openFollowingModal('select'));
+    }
+
+    const manageBtn = qs('#rb-following-manage');
+    if (manageBtn && manageBtn.dataset.rbBound !== '1') {
+        manageBtn.dataset.rbBound = '1';
+        manageBtn.addEventListener('click', () => openFollowingModal('manage'));
+    }
+};
+
 const setVisiblePage = (page) => {
     qs('#rb-page-list')?.classList.toggle('hidden', page !== 'list');
     qs('#rb-page-setting')?.classList.toggle('hidden', page !== 'setting');
-    qs('#rb-page-following')?.classList.toggle('hidden', page !== 'following');
 };
 
 const refresh = async () => {
@@ -943,10 +1544,6 @@ const refresh = async () => {
         return;
     }
 
-    if (page === 'following') {
-        return;
-    }
-
     lastTabRenderState = { menu, categoryKey, tabKey, subKey };
     renderTabs(lastTabRenderState);
     await refreshList({ menu, categoryKey, tabKey, subKey });
@@ -955,6 +1552,7 @@ const refresh = async () => {
 const main = async () => {
     bindHeader();
     bindSearch();
+    bindFollowingUi();
     qs('#rb-rising-refresh')?.addEventListener('click', () => {
         risingSeed++;
         refreshRising();

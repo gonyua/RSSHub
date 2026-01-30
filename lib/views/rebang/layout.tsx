@@ -1,7 +1,7 @@
 import { raw } from 'hono/html';
-import type { FC } from 'hono/jsx';
+import type { FC, PropsWithChildren } from 'hono/jsx';
 
-export const RebangLayout: FC<Props> = ({ children, title }) => (
+export const RebangLayout: FC<PropsWithChildren<{ title: string }>> = ({ children, title }) => (
     <>
         {raw('<!DOCTYPE html>')}
         <html lang="zh-CN">
