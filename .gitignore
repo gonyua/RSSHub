@@ -29,6 +29,7 @@ tmp
 dist
 dist-lib
 dist-worker
+src/
 .wrangler
 
 Session.vim

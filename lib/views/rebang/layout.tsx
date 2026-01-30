@@ -1,7 +1,7 @@
 import { raw } from 'hono/html';
 import type { FC } from 'hono/jsx';
 
-export const RebangLayout: FC<{ title: string }> = ({ children, title }) => (
+export const RebangLayout: FC<Props> = ({ children, title }) => (
     <>
         {raw('<!DOCTYPE html>')}
         <html lang="zh-CN">
@@ -9,6 +9,9 @@ export const RebangLayout: FC<{ title: string }> = ({ children, title }) => (
                 <meta charSet="utf-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <title>{title}</title>
+                <link rel="icon" href="/favicon.ico" />
+                <link rel="icon" type="image/png" href="/favicon.png" />
+                <link rel="apple-touch-icon" href="/logo.png" />
 
                 <script
                     dangerouslySetInnerHTML={{

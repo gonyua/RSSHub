@@ -131,12 +131,49 @@ const loadMenu = () => {
 const updateActiveNav = (categoryKey) => {
     for (const a of document.querySelectorAll('[data-rb-nav]')) {
         const k = a.dataset.rbNav;
-        a.classList.toggle('text-[color:var(--rb-text)]', k === categoryKey);
-        a.classList.toggle('text-[color:var(--rb-text-2)]', k !== categoryKey);
-        a.classList.toggle('border-b-2', k === categoryKey);
-        a.classList.toggle('border-[#2563eb]', k === categoryKey);
-        a.classList.toggle('pb-3', k === categoryKey);
+        const active = k === categoryKey;
+        a.classList.toggle('text-[#165DFF]', active);
+        a.classList.toggle('text-[color:var(--rb-text-2)]', !active);
+        a.classList.toggle('border-[#165DFF]', active);
+        a.classList.toggle('border-transparent', !active);
+        a.classList.toggle('font-semibold', active);
+        a.classList.toggle('font-medium', !active);
+        a.classList.toggle('hover:text-[color:var(--rb-text)]', !active);
     }
+};
+
+const TAB_ICONS = {
+    zhihu: '/rebang/icons/zhihu.png',
+    'zhihu-daily': '/rebang/icons/zhihu.png',
+    weibo: '/rebang/icons/weibo.png',
+    ithome: '/rebang/icons/ithome.png',
+    hupu: '/rebang/icons/hupu.png',
+    'tencent-news': '/rebang/icons/tencent-news.png',
+    'douban-community': '/rebang/icons/douban.png',
+    'douban-media': '/rebang/icons/douban.png',
+    huxiu: '/rebang/icons/huxiu.png',
+    sspai: '/rebang/icons/sspai.png',
+    thepaper: '/rebang/icons/thepaper.png',
+    xiaohongshu: '/rebang/icons/xiaohongshu.png',
+    '36kr': '/rebang/icons/36kr.png',
+    ifanr: '/rebang/icons/ifanr.png',
+    smzdm: '/rebang/icons/smzdm.png',
+    baidu: '/rebang/icons/baidu.png',
+    'baidu-tieba': '/rebang/icons/baidu.png',
+    'ne-news': '/rebang/icons/netease.png',
+    weread: '/rebang/icons/weread.png',
+    xueqiu: '/rebang/icons/xueqiu.png',
+    'guancha-user': '/rebang/icons/guancha.png',
+    landian: '/rebang/icons/landian.png',
+    appinn: '/rebang/icons/appinn.png',
+    apprcn: '/rebang/icons/apprcn.png',
+    zhibo8: '/rebang/icons/zhibo8.png',
+    bilibili: '/rebang/icons/bilibili.png',
+    douyin: '/rebang/icons/douyin.png',
+    xmyp: '/rebang/icons/xmyp.png',
+    gamersky: '/rebang/icons/gamersky.png',
+    juejin: '/rebang/icons/juejin.png',
+    github: '/rebang/icons/github.png',
 };
 
 const normalizeState = ({ menu, categoryKey, tabKey, subKey }) => {
@@ -156,8 +193,11 @@ const normalizeState = ({ menu, categoryKey, tabKey, subKey }) => {
 
 const renderTabs = ({ menu, categoryKey, tabKey, subKey }) => {
     const tabsEl = qs('#rb-tabs');
+    const expandBtn = qs('#rb-tab-expand');
+    const expandText = qs('#rb-tab-expand-text');
+    const expandIcon = qs('#rb-tab-expand-icon');
     const nodeSelect = qs('#rb-node-select');
-    if (!tabsEl || !nodeSelect) {
+    if (!tabsEl || !nodeSelect || !expandBtn || !expandText || !expandIcon) {
         return;
     }
 
@@ -169,53 +209,127 @@ const renderTabs = ({ menu, categoryKey, tabKey, subKey }) => {
     const expandedDefault = getSetting(STORAGE.tabBarDefault) === 'expanded';
     const isExpanded = localStorage.getItem('rebang:tabExpanded') ? localStorage.getItem('rebang:tabExpanded') === 'true' : expandedDefault;
 
-    const expandBtnStub = qs('#rb-tab-expand');
-    const tabsContainer = qs('#rb-tabs-container');
-
-    // 状态切换：外置按钮 vs 内置按钮
-    if (isExpanded) {
-        tabsEl.classList.add('flex-wrap');
-        tabsContainer?.classList.remove('overflow-x-auto');
-        expandBtnStub?.classList.add('hidden');
-    } else {
-        tabsEl.classList.remove('flex-wrap');
-        tabsContainer?.classList.add('overflow-x-auto');
-        expandBtnStub?.classList.remove('hidden');
-    }
-
     const tabs = state.category.tabs || [];
     const activeKey = state.tab?.key;
 
-    let tabsHtml = tabs
+    tabsEl.innerHTML = tabs
         .map((t) => {
             const active = t.key === activeKey;
             const disabled = Boolean(t.disabled);
             const disabledReason = t.disabledReason ? String(t.disabledReason) : '';
-            const icon = t.iconText ? `<span class="w-6 h-6 rounded-md grid place-items-center text-xs font-black ${active ? 'bg-[#2563eb] text-white' : 'rb-chip'}">${escapeHtml(t.iconText)}</span>` : '';
-            const cls = disabled
-                ? 'opacity-50 cursor-not-allowed'
-                : active
-                  ? 'bg-[#2563eb]/15 text-[color:var(--rb-accent)] font-medium'
-                  : 'text-[color:var(--rb-text-2)] hover:text-[color:var(--rb-text)] hover:bg-[color:var(--rb-surface-2)]';
+            const iconUrl = TAB_ICONS[t.key];
+            const icon = iconUrl
+                ? `<img src="${escapeHtml(iconUrl)}" class="w-5 h-5 rounded-sm" loading="lazy" alt="" />`
+                : t.iconText
+                  ? `<span class="w-6 h-6 rounded-md grid place-items-center text-xs font-black ${active ? 'bg-[#165DFF] text-white' : 'rb-chip'}">${escapeHtml(t.iconText)}</span>`
+                  : '';
+            const cls = disabled ? 'opacity-50 cursor-not-allowed' : active ? 'rb-site-tab-active' : 'text-[color:var(--rb-text-2)] rb-site-tab-inactive';
             return `
-            <button type="button" data-rb-tab="${escapeHtml(t.key)}" data-rb-disabled="${disabled ? '1' : '0'}" data-rb-disabled-reason="${escapeHtml(disabledReason)}" class="shrink-0 inline-flex items-center gap-2 px-3 py-2 rounded-lg ${cls} rb-ring">
+            <button type="button" data-rb-tab="${escapeHtml(t.key)}" data-rb-disabled="${disabled ? '1' : '0'}" data-rb-disabled-reason="${escapeHtml(disabledReason)}" class="shrink-0 inline-flex items-center gap-1.5 h-8 px-2 rounded-lg text-sm ${cls} rb-ring">
               ${icon}<span class="font-semibold">${escapeHtml(t.name)}</span>
             </button>
           `;
         })
         .join('');
 
-    // 如果是展开状态，把“收起”按钮加在最后
-    if (isExpanded) {
-        tabsHtml += `
-            <button type="button" id="rb-tab-collapse" class="ml-auto shrink-0 inline-flex items-center gap-1 pl-3 pr-1 py-2 rounded-lg text-[color:var(--rb-text-2)] hover:text-[color:var(--rb-text)] rb-ring">
-                <span>收起</span>
-                <svg viewBox="0 0 24 24" class="w-4 h-4 rotate-180" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-            </button>
-        `;
-    }
+    tabsEl.style.flexWrap = 'wrap';
+    tabsEl.style.maxHeight = 'none';
+    tabsEl.style.overflow = 'visible';
+    tabsEl.style.transition = '';
+    tabsEl.style.paddingRight = '0';
+    tabsEl.style.paddingBottom = '0';
 
-    tabsEl.innerHTML = tabsHtml;
+    const tabButtons = [...tabsEl.querySelectorAll('[data-rb-tab]')];
+    const topSet = new Set(tabButtons.map((el) => Math.round(el.offsetTop)));
+    const showExpand = tabButtons.length > 0 && topSet.size > 1;
+    const firstTop = tabButtons[0] ? Math.round(tabButtons[0].offsetTop) : 0;
+    let firstRowBottom = 0;
+    for (const el of tabButtons) {
+        if (Math.round(el.offsetTop) !== firstTop) {
+            continue;
+        }
+        firstRowBottom = Math.max(firstRowBottom, el.offsetTop + el.offsetHeight);
+    }
+    const collapsedHeight = firstRowBottom ? firstRowBottom + 2 : 44;
+
+    expandBtn.classList.toggle('hidden', !showExpand);
+
+    if (showExpand) {
+        expandText.textContent = isExpanded ? '收起' : '展开';
+        expandBtn.dataset.rbExpanded = isExpanded ? '1' : '0';
+        expandIcon.style.transform = isExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
+        expandIcon.style.transition = '';
+
+        expandBtn.classList.remove('hidden');
+        tabsEl.style.transition = '';
+        tabsEl.style.paddingRight = '0';
+        tabsEl.style.paddingBottom = '0';
+
+        if (isExpanded) {
+            tabsEl.style.flexWrap = 'wrap';
+            expandBtn.style.bottom = '';
+            expandBtn.style.transform = '';
+
+            tabsEl.style.maxHeight = 'none';
+            tabsEl.style.overflow = 'visible';
+
+            let lastTop = firstTop;
+            for (const el of tabButtons) {
+                lastTop = Math.max(lastTop, Math.round(el.offsetTop));
+            }
+            let lastRowHeight = 0;
+            for (const el of tabButtons) {
+                if (Math.round(el.offsetTop) !== lastTop) {
+                    continue;
+                }
+                lastRowHeight = Math.max(lastRowHeight, el.offsetHeight);
+            }
+
+            // 计算展开按钮在最后一行的垂直居中位置
+            const lastRowOffsetTop = lastTop;
+            const btnTop = lastRowOffsetTop + Math.floor((lastRowHeight - expandBtn.offsetHeight) / 2);
+            expandBtn.style.top = `${btnTop}px`;
+
+            tabsEl.style.paddingRight = '0';
+            const overlapWidth = Math.max(0, tabsEl.getBoundingClientRect().right - expandBtn.getBoundingClientRect().left);
+            const pad = overlapWidth ? Math.ceil(overlapWidth + 8) : expandBtn.offsetWidth ? Math.ceil(expandBtn.offsetWidth + 8) : 88;
+            tabsEl.style.paddingRight = `${pad}px`;
+        } else {
+            tabsEl.style.flexWrap = 'nowrap';
+            expandBtn.style.top = '50%';
+            expandBtn.style.bottom = '';
+            expandBtn.style.transform = 'translateY(-50%)';
+
+            tabsEl.style.maxHeight = `${collapsedHeight}px`;
+            tabsEl.style.overflow = 'hidden';
+
+            tabsEl.style.paddingRight = '0';
+            const overlapWidth = Math.max(0, tabsEl.getBoundingClientRect().right - expandBtn.getBoundingClientRect().left);
+            const pad = overlapWidth ? Math.ceil(overlapWidth + 8) : expandBtn.offsetWidth ? Math.ceil(expandBtn.offsetWidth + 8) : 88;
+            tabsEl.style.paddingRight = `${pad}px`;
+        }
+
+        if (expandBtn.dataset.rbBound !== '1') {
+            expandBtn.dataset.rbBound = '1';
+            expandBtn.addEventListener('click', () => {
+                const expandedDefault = getSetting(STORAGE.tabBarDefault) === 'expanded';
+                const raw = localStorage.getItem('rebang:tabExpanded');
+                const expandedNow = raw ? raw === 'true' : expandedDefault;
+                localStorage.setItem('rebang:tabExpanded', String(!expandedNow));
+                refresh();
+            });
+        }
+    } else {
+        expandBtn.dataset.rbExpanded = '0';
+        expandBtn.style.top = '';
+        expandBtn.style.bottom = '';
+        expandBtn.style.transform = '';
+        tabsEl.style.maxHeight = 'none';
+        tabsEl.style.overflow = 'visible';
+        tabsEl.style.transition = '';
+        tabsEl.style.paddingRight = '0';
+        tabsEl.style.paddingBottom = '0';
+    }
 
     nodeSelect.innerHTML = [
         '<option value="">全部节点</option>',
@@ -238,16 +352,6 @@ const renderTabs = ({ menu, categoryKey, tabKey, subKey }) => {
             navigateWith({ tab: nextTabKey, sub: null }, { replace: false });
         });
     }
-
-    // 处理展开/收起点击
-    const handleToggle = () => {
-        const next = !isExpanded;
-        localStorage.setItem('rebang:tabExpanded', String(next));
-        renderTabs({ menu, categoryKey, tabKey: activeKey, subKey });
-    };
-
-    expandBtnStub?.addEventListener('click', handleToggle);
-    qs('#rb-tab-collapse')?.addEventListener('click', handleToggle);
 
     nodeSelect.addEventListener('change', () => {
         const v = nodeSelect.value || null;
@@ -280,7 +384,7 @@ const renderSubTabs = ({ menu, categoryKey, tabKey, subKey }) => {
             const active = s.key === state.subKey;
             const disabled = Boolean(s.disabled);
             const disabledReason = s.disabledReason ? String(s.disabledReason) : '';
-            const cls = disabled ? 'opacity-50 cursor-not-allowed' : active ? 'text-[color:var(--rb-text)] border-b-2 border-[#2563eb]' : 'text-[color:var(--rb-text-2)] hover:text-[color:var(--rb-text)]';
+            const cls = disabled ? 'opacity-50 cursor-not-allowed' : active ? 'text-[color:var(--rb-text)] border-b-2 border-[#165DFF]' : 'text-[color:var(--rb-text-2)] hover:text-[color:var(--rb-text)]';
             return `<button type="button" data-rb-sub="${escapeHtml(s.key)}" data-rb-disabled="${disabled ? '1' : '0'}" data-rb-disabled-reason="${escapeHtml(disabledReason)}" class="pb-1 ${cls} rb-ring">${escapeHtml(s.name)}</button>`;
         })
         .join('');
@@ -419,6 +523,7 @@ const fetchItems = async ({ categoryKey, tabKey, subKey }) => {
 };
 
 let lastListData = null;
+let lastTabRenderState = null;
 let lastListState = null;
 let journalTechFilterState = null;
 let journalTechTransientExcluded = null;
@@ -842,7 +947,8 @@ const refresh = async () => {
         return;
     }
 
-    renderTabs({ menu, categoryKey, tabKey, subKey });
+    lastTabRenderState = { menu, categoryKey, tabKey, subKey };
+    renderTabs(lastTabRenderState);
     await refreshList({ menu, categoryKey, tabKey, subKey });
 };
 
@@ -855,6 +961,12 @@ const main = async () => {
     });
 
     window.addEventListener('popstate', refresh);
+    window.addEventListener('resize', () => {
+        if (!lastTabRenderState) {
+            return;
+        }
+        window.requestAnimationFrame(() => renderTabs(lastTabRenderState));
+    });
 
     const current = new URL(window.location.href);
     if (current.pathname === '/rebang' || current.pathname === '/rebang/') {
